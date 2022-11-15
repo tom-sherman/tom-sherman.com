@@ -1,5 +1,10 @@
+import type { MetaFunction } from "@remix-run/cloudflare";
 import { Link, Outlet } from "@remix-run/react";
 import { Copyright } from "~/components/copyright";
+
+export const meta: MetaFunction = () => ({
+  title: "Blog | Tom Sherman",
+});
 
 export default function Blog() {
   return (
@@ -13,6 +18,13 @@ export default function Blog() {
         <ul>
           <li>
             <Link to="/blog">All posts</Link>
+          </li>
+          <li>
+            <Link to="/">
+              <span role="img" aria-label="Home">
+                🏠
+              </span>
+            </Link>
           </li>
         </ul>
       </nav>

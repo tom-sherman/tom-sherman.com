@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/cloudflare";
+import type { LoaderArgs, SerializeFrom } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 import { BlogData } from "~/blog-data.server";
@@ -22,6 +22,15 @@ export async function loader({ params, context }: LoaderArgs) {
     post,
   });
 }
+
+export const meta = ({ data }: { data: SerializeFrom<typeof loader> }) => {
+  return {
+    title: data.post.title,
+    "og:title": data.post.title,
+    "og:description": "A blog post by Tom Sherman",
+    "og:image": "/me.jpg",
+  };
+};
 
 export default function BlogPost() {
   const { post } = useLoaderData<typeof loader>();
