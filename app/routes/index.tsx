@@ -1,7 +1,8 @@
 import type { LoaderArgs } from "@remix-run/cloudflare";
-import { json } from "@remix-run/cloudflare";
-import { Link, useLoaderData } from "@remix-run/react";
+import { defer } from "@remix-run/cloudflare";
+import { Link, useLoaderData, Await } from "@remix-run/react";
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 import { BlogData } from "~/blog-data.server";
 import { Copyright } from "~/components/copyright";
 import { MASTODON_URL } from "~/constants";
@@ -9,22 +10,24 @@ import { MASTODON_URL } from "~/constants";
 export async function loader({ context }: LoaderArgs) {
   const blog = new BlogData(context as any);
 
-  return json({
-    recentBlogPosts: (await blog.listAllPosts())
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-      .slice(0, 3)
-      .map((post) => ({
-        title: post.title,
-        url: `/blog/${post.slug}`,
-        createdAt: new Intl.DateTimeFormat("en-GB", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }).format(new Date(post.createdAt)),
-      })),
+  return defer({
+    recentBlogPosts: blog.listAllPosts().then((posts) =>
+      posts
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        .slice(0, 3)
+        .map((post) => ({
+          title: post.title,
+          url: `/blog/${post.slug}`,
+          createdAt: new Intl.DateTimeFormat("en-GB", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }).format(new Date(post.createdAt)),
+        }))
+    ),
   });
 }
 
@@ -40,14 +43,20 @@ export default function Index() {
 
         <Link to="/blog">View all blog posts</Link>
         <div className="grid">
-          {recentBlogPosts.map((post) => (
-            <article key={post.url}>
-              <header>{post.createdAt}</header>
-              <Link to={post.url}>
-                <h4>{post.title}</h4>
-              </Link>
-            </article>
-          ))}
+          <Suspense fallback={<article aria-busy />}>
+            <Await resolve={recentBlogPosts}>
+              {(posts) =>
+                posts.map((post) => (
+                  <article key={post.url}>
+                    <header>{post.createdAt}</header>
+                    <Link to={post.url}>
+                      <h4>{post.title}</h4>
+                    </Link>
+                  </article>
+                ))
+              }
+            </Await>
+          </Suspense>
         </div>
 
         <h2>Projects</h2>
