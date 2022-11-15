@@ -2,6 +2,8 @@ import { request as githubRequest } from "@octokit/request";
 import { marked } from "marked";
 import { z } from "zod";
 
+const postCachePromise = caches.open("post_cache");
+
 export class BlogData {
   #gh: ReturnType<
     typeof githubRequest.defaults<{
@@ -17,17 +19,13 @@ export class BlogData {
       request,
       init
     ) => {
-      const cache = await caches.open("post_cache");
+      const cache = await postCachePromise;
       let response = await cache.match(request);
 
       if (!response) {
         response = await fetch(request, init);
         response = new Response(response.body, response);
-        response.headers.append("Cache-Control", "s-maxage=10");
         context.waitUntil(cache.put(request, response.clone()));
-        console.log("cache miss");
-      } else {
-        console.log("cache hit");
       }
 
       return response;
@@ -51,8 +49,6 @@ export class BlogData {
     if (!post) {
       return null;
     }
-
-    console.log(post.path);
 
     const content = await this.#getRawFileContents(`posts/${post.path}`);
 
@@ -112,7 +108,7 @@ type ContentsApiResponse = Awaited<
 >;
 
 function parseContentsResponse(res: ContentsApiResponse) {
-  if (res.status === 200 && typeof res.data === "string") {
+  if (typeof res.data === "string") {
     return res.data;
   }
 
