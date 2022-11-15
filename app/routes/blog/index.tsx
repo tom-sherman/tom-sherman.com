@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { BlogData } from "~/blog-data.server";
 
 export async function loader({ context }: LoaderArgs) {
@@ -29,7 +29,7 @@ export default function BlogIndex() {
       <ul>
         {posts.map((post) => (
           <li key={post.slug}>
-            <a href={`/blog/${post.slug}`}>{post.title}</a>
+            <Link to={`/blog/${post.slug}`}>{post.title}</Link>
           </li>
         ))}
       </ul>
