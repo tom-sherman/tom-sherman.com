@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MASTODON_URL } from "~/constants";
 
 export default function Index() {
   return (
@@ -72,7 +73,7 @@ function Me() {
           </a>
         </li>
         <li>
-          <a rel="me" href="https://fosstodon.org/@tomsherman">
+          <a rel="me" href={MASTODON_URL}>
             Mastodon
           </a>
         </li>

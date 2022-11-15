@@ -8,6 +8,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import picoCss from "@picocss/pico/css/pico.min.css";
+import { MASTODON_URL } from "./constants";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -46,6 +47,10 @@ export const links: LinksFunction = () => [
     type: "image/png",
     sizes: "16x16",
     href: "/favicon-16x16.png",
+  },
+  {
+    rel: "me",
+    href: MASTODON_URL,
   },
 ];
 
