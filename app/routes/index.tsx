@@ -1,49 +1,54 @@
 import type { ReactNode } from "react";
+import { Copyright } from "~/components/copyright";
 import { MASTODON_URL } from "~/constants";
 
 export default function Index() {
   return (
-    <main className="container">
-      <Me />
+    <>
+      <main className="container">
+        <Me />
 
-      <h2>Projects</h2>
+        <h2>Projects</h2>
 
-      <Project
-        name="Yet Another Javascript Minifier"
-        url="https://tom-sherman.github.io/yet-another-js-online-minifier/"
-        description={
-          <p>
-            There's a thousand of these available online but this one handles
-            massive files without hanging the browser and supports ES6.
-          </p>
-        }
-      />
-      <Project
-        name="Orangutan"
-        url="https://github.com/tom-sherman/orangutan"
-        description={
-          <p>
-            Written in Typescript, Orangutan is a lazy range and list library
-            for JavaScript. It's heavily inspired by Haskell's lists and range
-            syntax.
-          </p>
-        }
-      />
-      <Project
-        name="CoffeeBird"
-        url="https://github.com/tom-sherman/coffeebird"
-        description={
-          <p>
-            RBLang is <a href="https://rainbird.ai">Rainbird</a>'s XML based
-            language which is used to define concepts, relationships, and rules
-            to solve complex decision making problems. CoffeeBird replicates all
-            of the features of RBLang without the visual noise of XML.
-          </p>
-        }
-      />
-
-      <footer>⚛️ Copyright Tom Sherman, {new Date().getFullYear()}.</footer>
-    </main>
+        <Project
+          name="Yet Another Javascript Minifier"
+          url="https://tom-sherman.github.io/yet-another-js-online-minifier/"
+          description={
+            <p>
+              There's a thousand of these available online but this one handles
+              massive files without hanging the browser and supports ES6.
+            </p>
+          }
+        />
+        <Project
+          name="Orangutan"
+          url="https://github.com/tom-sherman/orangutan"
+          description={
+            <p>
+              Written in Typescript, Orangutan is a lazy range and list library
+              for JavaScript. It's heavily inspired by Haskell's lists and range
+              syntax.
+            </p>
+          }
+        />
+        <Project
+          name="CoffeeBird"
+          url="https://github.com/tom-sherman/coffeebird"
+          description={
+            <p>
+              RBLang is <a href="https://rainbird.ai">Rainbird</a>'s XML based
+              language which is used to define concepts, relationships, and
+              rules to solve complex decision making problems. CoffeeBird
+              replicates all of the features of RBLang without the visual noise
+              of XML.
+            </p>
+          }
+        />
+      </main>
+      <footer className="container">
+        <Copyright />
+      </footer>
+    </>
   );
 }
 
