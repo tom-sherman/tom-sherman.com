@@ -2,8 +2,6 @@ import { request as githubRequest } from "@octokit/request";
 import { marked } from "marked";
 import { z } from "zod";
 
-const postCachePromise = caches.open("post_cache");
-
 export class BlogData {
   #gh: ReturnType<
     typeof githubRequest.defaults<{
@@ -19,23 +17,23 @@ export class BlogData {
       request,
       init
     ) => {
-      const cache = await postCachePromise;
+      const cache = await caches.open("post_cache");
       let response = await cache.match(request);
 
       if (!response) {
         response = await fetch(request, init);
         response = new Response(response.body, response);
         response.headers.set("Cache-Control", "s-maxage=60");
-        // context.waitUntil(cache.put(request, response.clone()));
+        context.waitUntil(cache.put(request, response.clone()));
       }
 
       return response;
     };
 
     this.#gh = githubRequest.defaults({
-      // request: {
-      //   fetch: githubFetchWithCache,
-      // },
+      request: {
+        fetch: githubFetchWithCache,
+      },
       headers: {
         authorization: `token ${(context as any).env.GITHUB_TOKEN}`,
         accept: "application/vnd.github.v3+json",
