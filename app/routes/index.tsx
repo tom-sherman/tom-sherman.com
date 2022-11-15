@@ -1,49 +1,96 @@
+import type { LoaderArgs } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
+import { Link, useLoaderData } from "@remix-run/react";
 import type { ReactNode } from "react";
+import { BlogData } from "~/blog-data.server";
+import { Copyright } from "~/components/copyright";
 import { MASTODON_URL } from "~/constants";
 
+export async function loader({ context }: LoaderArgs) {
+  const blog = new BlogData(context as any);
+
+  return json({
+    recentBlogPosts: (await blog.listAllPosts())
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      .slice(0, 3)
+      .map((post) => ({
+        title: post.title,
+        url: `/blog/${post.slug}`,
+        createdAt: new Intl.DateTimeFormat("en-GB", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(new Date(post.createdAt)),
+      })),
+  });
+}
+
 export default function Index() {
+  const { recentBlogPosts } = useLoaderData<typeof loader>();
+
   return (
-    <main className="container">
-      <Me />
+    <>
+      <main className="container">
+        <Me />
 
-      <h2>Projects</h2>
+        <h2>Recent blog posts</h2>
 
-      <Project
-        name="Yet Another Javascript Minifier"
-        url="https://tom-sherman.github.io/yet-another-js-online-minifier/"
-        description={
-          <p>
-            There's a thousand of these available online but this one handles
-            massive files without hanging the browser and supports ES6.
-          </p>
-        }
-      />
-      <Project
-        name="Orangutan"
-        url="https://github.com/tom-sherman/orangutan"
-        description={
-          <p>
-            Written in Typescript, Orangutan is a lazy range and list library
-            for JavaScript. It's heavily inspired by Haskell's lists and range
-            syntax.
-          </p>
-        }
-      />
-      <Project
-        name="CoffeeBird"
-        url="https://github.com/tom-sherman/coffeebird"
-        description={
-          <p>
-            RBLang is <a href="https://rainbird.ai">Rainbird</a>'s XML based
-            language which is used to define concepts, relationships, and rules
-            to solve complex decision making problems. CoffeeBird replicates all
-            of the features of RBLang without the visual noise of XML.
-          </p>
-        }
-      />
+        <Link to="/blog">View all blog posts</Link>
+        <div className="grid">
+          {recentBlogPosts.map((post) => (
+            <article key={post.url}>
+              <header>{post.createdAt}</header>
+              <Link to={post.url}>
+                <h4>{post.title}</h4>
+              </Link>
+            </article>
+          ))}
+        </div>
 
-      <footer>⚛️ Copyright Tom Sherman, {new Date().getFullYear()}.</footer>
-    </main>
+        <h2>Projects</h2>
+
+        <Project
+          name="Yet Another Javascript Minifier"
+          url="https://tom-sherman.github.io/yet-another-js-online-minifier/"
+          description={
+            <p>
+              There's a thousand of these available online but this one handles
+              massive files without hanging the browser and supports ES6.
+            </p>
+          }
+        />
+        <Project
+          name="Orangutan"
+          url="https://github.com/tom-sherman/orangutan"
+          description={
+            <p>
+              Written in Typescript, Orangutan is a lazy range and list library
+              for JavaScript. It's heavily inspired by Haskell's lists and range
+              syntax.
+            </p>
+          }
+        />
+        <Project
+          name="CoffeeBird"
+          url="https://github.com/tom-sherman/coffeebird"
+          description={
+            <p>
+              RBLang is <a href="https://rainbird.ai">Rainbird</a>'s XML based
+              language which is used to define concepts, relationships, and
+              rules to solve complex decision making problems. CoffeeBird
+              replicates all of the features of RBLang without the visual noise
+              of XML.
+            </p>
+          }
+        />
+      </main>
+      <footer className="container">
+        <Copyright />
+      </footer>
+    </>
   );
 }
 
