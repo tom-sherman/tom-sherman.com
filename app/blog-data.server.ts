@@ -25,6 +25,7 @@ export class BlogData {
       if (!response) {
         response = await fetch(request, init);
         response = new Response(response.body, response);
+        response.headers.set("Cache-Control", "s-maxage=60");
         context.waitUntil(cache.put(request, response.clone()));
       }
 
