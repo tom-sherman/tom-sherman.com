@@ -33,9 +33,9 @@ export class BlogData {
     };
 
     this.#gh = githubRequest.defaults({
-      request: {
-        fetch: githubFetchWithCache,
-      },
+      // request: {
+      //   fetch: githubFetchWithCache,
+      // },
       headers: {
         authorization: `token ${(context as any).env.GITHUB_TOKEN}`,
         accept: "application/vnd.github.v3+json",
