@@ -4,7 +4,7 @@ import { useLoaderData } from "@remix-run/react";
 import { BlogData } from "~/blog-data.server";
 
 export async function loader({ params, context }: LoaderArgs) {
-  const blog = new BlogData((context as any).GITHUB_TOKEN);
+  const blog = new BlogData(context as any);
 
   const slug = params.slug;
 

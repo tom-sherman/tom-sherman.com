@@ -2,20 +2,6 @@ import { request as githubRequest } from "@octokit/request";
 import { marked } from "marked";
 import { z } from "zod";
 
-const githubFetchWithCache: typeof globalThis.fetch = async (request, init) => {
-  const cache = await caches.open("post_cache");
-  const hit = await cache.match(request);
-  if (hit) {
-    return hit;
-  }
-  const response = await fetch(request, init);
-  if (response.ok) {
-    await cache.put(request, response.clone());
-  }
-
-  return response;
-};
-
 export class BlogData {
   #gh: ReturnType<
     typeof githubRequest.defaults<{
@@ -26,13 +12,33 @@ export class BlogData {
     }>
   >;
 
-  constructor(token: string) {
+  constructor(context: ExecutionContext) {
+    const githubFetchWithCache: typeof globalThis.fetch = async (
+      request,
+      init
+    ) => {
+      const cache = await caches.open("post_cache");
+      let response = await cache.match(request);
+
+      if (!response) {
+        response = await fetch(request, init);
+        response = new Response(response.body, response);
+        response.headers.append("Cache-Control", "s-maxage=10");
+        context.waitUntil(cache.put(request, response.clone()));
+        console.log("cache miss");
+      } else {
+        console.log("cache hit");
+      }
+
+      return response;
+    };
+
     this.#gh = githubRequest.defaults({
       request: {
         fetch: githubFetchWithCache,
       },
       headers: {
-        authorization: `token ${token}`,
+        authorization: `token ${(context as any).env.GITHUB_TOKEN}`,
         accept: "application/vnd.github.v3+json",
       },
     });
