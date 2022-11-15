@@ -141,7 +141,7 @@ function Project({ name, url, description }: ProjectProps) {
       <h3>
         <a href={url}>{name}</a>
       </h3>
-      <p>{description}</p>
+      {description}
     </article>
   );
 }
