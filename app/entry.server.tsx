@@ -1,21 +1,53 @@
 import type { EntryContext } from "@remix-run/cloudflare";
 import { RemixServer } from "@remix-run/react";
-import { renderToString } from "react-dom/server";
+import { renderToReadableStream } from "react-dom/server";
+import isbot from "isbot";
 
-export default function handleRequest(
+export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
-  const markup = renderToString(
-    <RemixServer context={remixContext} url={request.url} />
+  const http2PushLinksHeaders = remixContext.matches
+    .flatMap(({ route: { module, imports } }) => [module, ...(imports || [])])
+    .filter(Boolean)
+    .concat([
+      remixContext.manifest.url,
+      remixContext.manifest.entry.module,
+      ...remixContext.manifest.entry.imports,
+    ]);
+  responseHeaders.set(
+    "Link",
+    http2PushLinksHeaders
+      .map(
+        (link: string) =>
+          `<${link}>; rel=preload; as=script; crossorigin=anonymous`
+      )
+      .concat(responseHeaders.get("Link") as string)
+      .filter(Boolean)
+      .join(",")
   );
 
-  responseHeaders.set("Content-Type", "text/html");
+  const controller = new AbortController();
+  let didError = false;
+  const stream = await renderToReadableStream(
+    <RemixServer context={remixContext} url={request.url} />,
+    {
+      signal: controller.signal,
+      onError(error) {
+        didError = true;
+        console.error(error);
+      },
+    }
+  );
 
-  return new Response("<!DOCTYPE html>" + markup, {
-    status: responseStatusCode,
+  if (isbot(request.headers.get("user-agent"))) {
+    await stream.allReady;
+  }
+
+  return new Response(stream, {
+    status: didError ? 500 : responseStatusCode,
     headers: responseHeaders,
   });
 }
