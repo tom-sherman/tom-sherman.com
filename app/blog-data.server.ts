@@ -2,6 +2,20 @@ import { request as githubRequest } from "@octokit/request";
 import { marked } from "marked";
 import { z } from "zod";
 
+const githubFetchWithCache: typeof globalThis.fetch = async (request, init) => {
+  const cache = await caches.open("post_cache");
+  const hit = await cache.match(request);
+  if (hit) {
+    return hit;
+  }
+  const response = await fetch(request, init);
+  if (response.ok) {
+    await cache.put(request, response.clone());
+  }
+
+  return response;
+};
+
 export class BlogData {
   #gh: ReturnType<
     typeof githubRequest.defaults<{
@@ -14,6 +28,9 @@ export class BlogData {
 
   constructor(token: string) {
     this.#gh = githubRequest.defaults({
+      request: {
+        fetch: githubFetchWithCache,
+      },
       headers: {
         authorization: `token ${token}`,
         accept: "application/vnd.github.v3+json",
