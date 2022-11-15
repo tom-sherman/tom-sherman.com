@@ -1,6 +1,54 @@
+import type { ReactNode } from "react";
+
 export default function Index() {
   return (
     <main className="container">
+      <Me />
+
+      <h2>Projects</h2>
+
+      <Project
+        name="Yet Another Javascript Minifier"
+        url="https://tom-sherman.github.io/yet-another-js-online-minifier/"
+        description={
+          <p>
+            There's a thousand of these available online but this one handles
+            massive files without hanging the browser and supports ES6.
+          </p>
+        }
+      />
+      <Project
+        name="Orangutan"
+        url="https://github.com/tom-sherman/orangutan"
+        description={
+          <p>
+            Written in Typescript, Orangutan is a lazy range and list library
+            for JavaScript. It's heavily inspired by Haskell's lists and range
+            syntax.
+          </p>
+        }
+      />
+      <Project
+        name="CoffeeBird"
+        url="https://github.com/tom-sherman/coffeebird"
+        description={
+          <p>
+            RBLang is <a href="https://rainbird.ai">Rainbird</a>'s XML based
+            language which is used to define concepts, relationships, and rules
+            to solve complex decision making problems. CoffeeBird replicates all
+            of the features of RBLang without the visual noise of XML.
+          </p>
+        }
+      />
+
+      <footer>⚛️ Copyright Tom Sherman, {new Date().getFullYear()}.</footer>
+    </main>
+  );
+}
+
+function Me() {
+  return (
+    <>
       <img
         style={{ borderRadius: "50%", width: "10rem" }}
         src="/me.jpg"
@@ -29,73 +77,23 @@ export default function Index() {
           </a>
         </li>
       </ul>
-      <h2>Projects</h2>
-      <article className="project">
-        <h3>
-          <a href="https://tom-sherman.github.io/yet-another-js-online-minifier/">
-            Yet Another Javascript Minifier
-          </a>
-        </h3>
-        <p>
-          There's a thousand of these available online but this one handles
-          massive files without hanging the browser and supports ES6.
-        </p>
-      </article>
-      <article className="project">
-        <h3>
-          <a href="https://github.com/tom-sherman/orangutan">Orangutan</a>
-        </h3>
-        <p>
-          Written in Typescript, Orangutan is a lazy range and list library for
-          JavaScript. It's heavily inspired by Haskell's lists and range syntax.
-        </p>
-      </article>
-      <article className="project">
-        <h3>
-          <a href="https://github.com/tom-sherman/coffeebird">CoffeeBird</a>
-        </h3>
-        <p>A DSL that compiles to RBLang.</p>
-        <p>
-          RBLang is <a href="https://rainbird.ai">Rainbird</a>'s XML based
-          language which is used to define concepts, relationships, and rules to
-          solve complex decision making problems. CoffeeBird replicates all of
-          the features of RBLang without the visual noise of XML.
-        </p>
-      </article>
-      <article className="project">
-        <h3>
-          <a href="https://github.com/tom-sherman/rainbird-engineer-tools">
-            Rainbird Engineer Tools
-          </a>
-        </h3>
-        <p>
-          A <a href="https://code.visualstudio.com/">Visual Studio Code</a>{" "}
-          extension that adds useful <a href="https://rainbird.ai">Rainbird</a>{" "}
-          knowledge authoring shortcuts.
-        </p>
-      </article>
-      <article className="project">
-        <h3>
-          <a href="https://github.com/tom-sherman/rainbird-api-js">
-            rainbird-api-js
-          </a>
-        </h3>
-        <p>Javascript promise-based wrapper around the Rainbird API.</p>
-        <p>
-          I'm currently working on porting this to Typescript. (Check the "next"
-          branch)
-        </p>
-      </article>
-      <article className="project">
-        <h3>
-          <a href="https://github.com/tom-sherman/set-operations-js">
-            set-operations
-          </a>
-        </h3>
-        <p>Performant Javascript set operations. Your Set's best friend.</p>
-      </article>
+    </>
+  );
+}
 
-      <footer>⚛️ Copyright Tom Sherman, {new Date().getFullYear()}.</footer>
-    </main>
+interface ProjectProps {
+  name: string;
+  url: string;
+  description: ReactNode;
+}
+
+function Project({ name, url, description }: ProjectProps) {
+  return (
+    <article className="project">
+      <h3>
+        <a href={url}>{name}</a>
+      </h3>
+      <p>{description}</p>
+    </article>
   );
 }
