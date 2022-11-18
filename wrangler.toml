@@ -1,1 +1,6 @@
 compatibility_flags = [ "streams_enable_constructors" ]
+
+[[ d1_databases ]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "db"
+database_id = "976709b4-43ab-4741-be57-ac10ee429296"

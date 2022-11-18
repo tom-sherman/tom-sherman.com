@@ -1,44 +1,39 @@
-import { request as githubRequest } from "@octokit/request";
+import type { request as githubRequest } from "@octokit/request";
+import type { ColumnType, Kysely, SelectType } from "kysely";
 import { marked } from "marked";
 import { z } from "zod";
 
-export class BlogData {
-  #gh: ReturnType<
-    typeof githubRequest.defaults<{
-      headers: {
-        authorization: string;
-        accept: string;
-      };
-    }>
-  >;
+const blogPostSchema = z.object({
+  title: z.string(),
+  createdAt: z.string(),
+  tags: z.array(z.string()).default([]),
+  content: z.string(),
+  status: z
+    .union([z.literal("unlisted"), z.literal("published")])
+    .default("published"),
+});
 
-  constructor(context: ExecutionContext) {
-    const githubFetchWithCache: typeof globalThis.fetch = async (
-      request,
-      init
-    ) => {
-      const cache = await caches.open("post_cache");
-      let response = await cache.match(request);
+type BlogPost = z.TypeOf<typeof blogPostSchema>;
 
-      if (!response) {
-        response = await fetch(request, init);
-        response = new Response(response.body, response);
-        response.headers.set("Cache-Control", "s-maxage=60");
-        context.waitUntil(cache.put(request, response.clone()));
-      }
+export interface BlogData {
+  getPost: (slug: string) => Promise<BlogPost | null>;
+  listAllPosts: () => Promise<BlogPost[]>;
+}
 
-      return response;
+type GitHubClient = ReturnType<
+  typeof githubRequest.defaults<{
+    headers: {
+      authorization: string;
+      accept: string;
     };
+  }>
+>;
 
-    this.#gh = githubRequest.defaults({
-      request: {
-        fetch: githubFetchWithCache,
-      },
-      headers: {
-        authorization: `token ${(context as any).env.GITHUB_TOKEN}`,
-        accept: "application/vnd.github.v3+json",
-      },
-    });
+export class GitHubBlogData implements BlogData {
+  #gh: GitHubClient;
+
+  constructor(gh: GitHubClient) {
+    this.#gh = gh;
   }
 
   async getPost(slug: string) {
@@ -89,17 +84,7 @@ export class BlogData {
 }
 
 const manifestSchema = z.object({
-  posts: z.record(
-    z.object({
-      title: z.string(),
-      createdAt: z.string(),
-      path: z.string(),
-      tags: z.array(z.string()).default([]),
-      status: z
-        .union([z.literal("unlisted"), z.literal("published")])
-        .default("published"),
-    })
-  ),
+  posts: z.record(blogPostSchema.and(z.object({ path: z.string() }))),
 });
 
 type ContentsApiResponse = Awaited<
@@ -112,4 +97,82 @@ function parseContentsResponse(res: ContentsApiResponse) {
   }
 
   throw new Error("Failed to get contents");
+}
+
+export interface BlogPostsTable {
+  Slug: ColumnType<string>;
+  Title: ColumnType<string>;
+  Content: ColumnType<string>;
+  CreatedAt: ColumnType<string>;
+  LastModifiedAt: ColumnType<string>;
+  Status: ColumnType<string>;
+  Tags: ColumnType<string>;
+}
+
+type BlogPostRow = {
+  [K in keyof BlogPostsTable]: SelectType<BlogPostsTable[K]>;
+};
+
+interface Database {
+  BlogPosts: BlogPostsTable;
+}
+
+export class D1BlogData implements BlogData {
+  #db: Kysely<Database>;
+
+  constructor(db: Kysely<Database>) {
+    this.#db = db;
+  }
+
+  async getPost(slug: string) {
+    const post = await this.#db
+      .selectFrom("BlogPosts")
+      .selectAll()
+      .where("Slug", "=", slug)
+      .executeTakeFirst();
+
+    if (!post) {
+      return null;
+    }
+
+    return mapBlogPostRowToBlogPost(post);
+  }
+
+  async listAllPosts() {
+    const posts = await this.#db
+      .selectFrom("BlogPosts")
+      .selectAll()
+      .where("Status", "=", "published")
+      .execute();
+
+    return posts.map(mapBlogPostRowToBlogPost);
+  }
+
+  async upsertPost(post: BlogPost & { slug: string }) {
+    const values = {
+      Slug: post.slug,
+      Title: post.title,
+      Content: post.content,
+      CreatedAt: post.createdAt,
+      LastModifiedAt: new Date().toISOString(),
+      Status: post.status,
+      Tags: JSON.stringify(post.tags),
+    };
+
+    await this.#db
+      .insertInto("BlogPosts")
+      .values(values)
+      .onDuplicateKeyUpdate({ ...values, Slug: undefined })
+      .execute();
+  }
+}
+
+function mapBlogPostRowToBlogPost(selection: BlogPostRow) {
+  return blogPostSchema.parse({
+    title: selection.Title,
+    createdAt: selection.CreatedAt,
+    content: selection.Content,
+    status: selection.Status,
+    tags: JSON.parse(selection.Tags),
+  });
 }
