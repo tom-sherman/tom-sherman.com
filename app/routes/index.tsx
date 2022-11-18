@@ -41,7 +41,6 @@ export default function Index() {
 
         <h2>Recent blog posts</h2>
 
-        <Link to="/blog">View all blog posts</Link>
         <div className="grid">
           <Suspense fallback={<article aria-busy />}>
             <Await
