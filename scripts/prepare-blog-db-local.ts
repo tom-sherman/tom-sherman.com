@@ -7,14 +7,16 @@ import * as dotenv from "dotenv";
 import * as path from "node:path";
 
 dotenv.config({
-  path: path.resolve(process.cwd(), ".dev.vars"),
+  path: path.resolve(process.cwd(), "../.dev.vars"),
 });
 
 const db = new Kysely<{
   BlogPosts: BlogPostsTable;
 }>({
   dialect: new SqliteDialect({
-    database: new Database(".wrangler/state/d1/DB.sqlite3"),
+    database: new Database(
+      path.resolve(process.cwd(), "../.wrangler/state/d1/DB.sqlite3")
+    ),
   }),
 });
 

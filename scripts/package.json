@@ -1,0 +1,11 @@
+{
+  "name": "scripts",
+  "private": true,
+  "dependencies": {
+    "better-sqlite3": "^7.6.2",
+    "tsx": "^3.12.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.2"
+  }
+}
