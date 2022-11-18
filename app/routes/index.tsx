@@ -44,7 +44,7 @@ export default function Index() {
         <Link to="/blog">View all blog posts</Link>
         <div className="grid">
           <Suspense fallback={<article aria-busy />}>
-            <Await resolve={recentBlogPosts}>
+            <Await resolve={recentBlogPosts} errorElement={<p>Oops!</p>}>
               {(posts) =>
                 posts.map((post) => (
                   <article key={post.url}>
