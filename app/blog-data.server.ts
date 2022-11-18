@@ -105,7 +105,7 @@ type ContentsApiResponse = Awaited<
 
 function parseContentsResponse(res: ContentsApiResponse) {
   if (typeof res.data === "string") {
-    return res.data;
+    return res.data as string;
   }
 
   throw new Error("Failed to get contents");
