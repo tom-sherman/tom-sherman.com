@@ -3,12 +3,12 @@ import { defer } from "@remix-run/cloudflare";
 import { Link, useLoaderData, Await } from "@remix-run/react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-import { BlogData } from "~/blog-data.server";
+import { createD1Kysely, D1BlogData } from "~/blog-data.server";
 import { Copyright } from "~/components/copyright";
 import { MASTODON_URL } from "~/constants";
 
 export async function loader({ context }: LoaderArgs) {
-  const blog = new BlogData(context as any);
+  const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
 
   return defer({
     recentBlogPosts: blog.listAllPosts().then((posts) =>

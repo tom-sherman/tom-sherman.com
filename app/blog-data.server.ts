@@ -1,23 +1,38 @@
 import type { request as githubRequest } from "@octokit/request";
-import type { ColumnType, Kysely, SelectType } from "kysely";
-import { marked } from "marked";
+import type { ColumnType, SelectType } from "kysely";
+import { Kysely } from "kysely";
+import { D1Dialect } from "kysely-d1";
 import { z } from "zod";
 
-const blogPostSchema = z.object({
+const blogPostTagsSchema = z.array(z.string());
+const blogPostStatusSchema = z.union([
+  z.literal("unlisted"),
+  z.literal("published"),
+]);
+
+const githubBlogDataSchema = z.object({
   title: z.string(),
   createdAt: z.string(),
-  tags: z.array(z.string()).default([]),
-  content: z.string(),
-  status: z
-    .union([z.literal("unlisted"), z.literal("published")])
-    .default("published"),
+  tags: blogPostTagsSchema.default([]),
+  path: z.string(),
+  status: blogPostStatusSchema.default("published"),
 });
 
-type BlogPost = z.TypeOf<typeof blogPostSchema>;
+const manifestSchema = z.object({
+  posts: z.record(githubBlogDataSchema),
+});
+
+type BlogPostListEntry = Omit<z.TypeOf<typeof githubBlogDataSchema>, "path"> & {
+  slug: string;
+};
+
+interface BlogPost extends BlogPostListEntry {
+  content: string;
+}
 
 export interface BlogData {
   getPost: (slug: string) => Promise<BlogPost | null>;
-  listAllPosts: () => Promise<BlogPost[]>;
+  listAllPosts: () => Promise<BlogPostListEntry[]>;
 }
 
 type GitHubClient = ReturnType<
@@ -48,7 +63,8 @@ export class GitHubBlogData implements BlogData {
 
     return {
       ...post,
-      content: marked(content),
+      slug,
+      content,
     };
   }
 
@@ -83,10 +99,6 @@ export class GitHubBlogData implements BlogData {
   }
 }
 
-const manifestSchema = z.object({
-  posts: z.record(blogPostSchema.and(z.object({ path: z.string() }))),
-});
-
 type ContentsApiResponse = Awaited<
   ReturnType<typeof githubRequest<"GET /repos/{owner}/{repo}/contents/{path}">>
 >;
@@ -116,6 +128,13 @@ type BlogPostRow = {
 interface Database {
   BlogPosts: BlogPostsTable;
 }
+
+export const createD1Kysely = (d1: D1Database) =>
+  new Kysely<Database>({
+    dialect: new D1Dialect({
+      database: d1,
+    }),
+  });
 
 export class D1BlogData implements BlogData {
   #db: Kysely<Database>;
@@ -168,11 +187,12 @@ export class D1BlogData implements BlogData {
 }
 
 function mapBlogPostRowToBlogPost(selection: BlogPostRow) {
-  return blogPostSchema.parse({
+  return {
+    slug: selection.Slug,
     title: selection.Title,
     createdAt: selection.CreatedAt,
     content: selection.Content,
-    status: selection.Status,
-    tags: JSON.parse(selection.Tags),
-  });
+    status: blogPostStatusSchema.parse(selection.Status),
+    tags: blogPostTagsSchema.parse(JSON.parse(selection.Tags)),
+  };
 }
