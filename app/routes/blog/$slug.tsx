@@ -1,6 +1,7 @@
 import type { LoaderArgs, SerializeFrom } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
+import { marked } from "marked";
 import { D1BlogData, createD1Kysely } from "~/blog-data.server";
 
 export async function loader({ params, context }: LoaderArgs) {
@@ -19,7 +20,10 @@ export async function loader({ params, context }: LoaderArgs) {
   }
 
   return json({
-    post,
+    post: {
+      title: post.title,
+      content: marked(post.content),
+    },
   });
 }
 
