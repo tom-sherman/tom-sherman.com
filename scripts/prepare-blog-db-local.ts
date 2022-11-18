@@ -20,6 +20,7 @@ const db = new Kysely<{
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
 
+// Make sure you initialise the local database with wrangler before running this script
 async function main() {
   await sql`
     CREATE TABLE IF NOT EXISTS BlogPosts (
