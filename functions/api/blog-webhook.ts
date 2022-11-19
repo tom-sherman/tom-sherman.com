@@ -8,6 +8,7 @@ export const onRequest: PagesFunction<{
   }
 
   const signature = request.headers.get("x-hub-signature-256");
+  console.log("signature", "signature");
   if (!signature) {
     return new Response("Missing signature", { status: 400 });
   }
@@ -23,7 +24,7 @@ export const onRequest: PagesFunction<{
     await crypto.subtle.importKey(
       "raw",
       encoder.encode(env.BLOG_WEBHOOK_SECRET),
-      { name: "SHA-256", hash: { name: "SHA-256" } },
+      { name: "HMAC", hash: "SHA-256" },
       true,
       ["verify"]
     ),
