@@ -20,7 +20,7 @@ export const onRequest: PagesFunction<{
   const body = await request.clone().text();
 
   const verified = await crypto.subtle.verify(
-    "SHA-256",
+    "HMAC",
     await crypto.subtle.importKey(
       "raw",
       encoder.encode(env.BLOG_WEBHOOK_SECRET),
