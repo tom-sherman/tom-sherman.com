@@ -3,7 +3,7 @@ import { z } from "zod";
 export const onRequest: PagesFunction<{
   BLOG_WEBHOOK_SECRET: string;
 }> = async ({ request, env }) => {
-  if (request.method !== "post") {
+  if (request.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
 
