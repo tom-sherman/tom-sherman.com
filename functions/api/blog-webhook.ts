@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { verify } from "@octokit/webhooks-methods";
 
 export const onRequest: PagesFunction<{
   BLOG_WEBHOOK_SECRET: string;
@@ -13,23 +14,15 @@ export const onRequest: PagesFunction<{
     return new Response("Missing signature", { status: 400 });
   }
 
-  const encoder = new TextEncoder();
   if (!signature) {
     return new Response("Missing signature", { status: 400 });
   }
   const body = await request.clone().text();
 
-  const verified = await crypto.subtle.verify(
-    "HMAC",
-    await crypto.subtle.importKey(
-      "raw",
-      encoder.encode(env.BLOG_WEBHOOK_SECRET),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["verify"]
-    ),
-    hexToUInt8Array(signature.slice("sha256=".length)),
-    encoder.encode(body)
+  const verified = await verify(
+    env.BLOG_WEBHOOK_SECRET,
+    body,
+    signature.slice("sha256=".length)
   );
 
   if (!verified) {

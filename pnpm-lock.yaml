@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@cloudflare/workers-types': ^3.18.0
   '@octokit/request': ^6.2.2
+  '@octokit/webhooks-methods': ^3.0.1
   '@picocss/pico': ^1.5.6
   '@remix-run/cloudflare': 0.0.0-experimental-9b7f37c9a
   '@remix-run/cloudflare-pages': 0.0.0-experimental-9b7f37c9a
@@ -29,6 +30,7 @@ specifiers:
 
 dependencies:
   '@octokit/request': 6.2.2
+  '@octokit/webhooks-methods': 3.0.1
   '@picocss/pico': 1.5.6
   '@remix-run/cloudflare': 0.0.0-experimental-9b7f37c9a_dp7lsxfcjoxmh2gy56a7syibgu
   '@remix-run/cloudflare-pages': 0.0.0-experimental-9b7f37c9a_dp7lsxfcjoxmh2gy56a7syibgu
@@ -1756,6 +1758,11 @@ packages:
     resolution: {integrity: sha512-65/TPpOJP1i3K4lBJMnWqPUJ6zuOtzhtagDvydAWbEXpbFYA0oMKKyLb95NFZZP0lSh/4b6K+DQlzvYQJQQePg==}
     dependencies:
       '@octokit/openapi-types': 14.0.0
+    dev: false
+
+  /@octokit/webhooks-methods/3.0.1:
+    resolution: {integrity: sha512-XftYVcBxtzC2G05kdBNn9IYLtQ+Cz6ufKkjZd0DU/qGaZEFTPzM2OabXAWG5tvL0q/I+Exio1JnRiPfetiMSEw==}
+    engines: {node: '>= 14'}
     dev: false
 
   /@picocss/pico/1.5.6:
