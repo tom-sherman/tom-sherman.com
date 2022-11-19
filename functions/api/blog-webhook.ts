@@ -25,10 +25,10 @@ export const onRequest: PagesFunction<{
       "raw",
       encoder.encode(env.BLOG_WEBHOOK_SECRET),
       { name: "HMAC", hash: "SHA-256" },
-      true,
+      false,
       ["verify"]
     ),
-    encoder.encode(signature.replace("sha256=", "")),
+    hexToUInt8Array(signature.slice("sha256=".length)),
     encoder.encode(body)
   );
 
@@ -60,3 +60,15 @@ const pushEventSchema = z.object({
     })
   ),
 });
+
+function hexToUInt8Array(string: string) {
+  // convert string to pairs of 2 characters
+  const pairs = string.match(/[\dA-F]{2}/gi) as RegExpMatchArray;
+
+  // convert the octets to integers
+  const integers = pairs.map(function (s) {
+    return parseInt(s, 16);
+  });
+
+  return new Uint8Array(integers);
+}
