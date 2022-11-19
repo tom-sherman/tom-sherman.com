@@ -8,7 +8,7 @@ export const onRequest: PagesFunction<{
   }
 
   const signature = request.headers.get("x-hub-signature-256");
-  console.log("signature", "signature");
+  console.log("signature", signature);
   if (!signature) {
     return new Response("Missing signature", { status: 400 });
   }
@@ -28,7 +28,7 @@ export const onRequest: PagesFunction<{
       true,
       ["verify"]
     ),
-    encoder.encode(signature),
+    encoder.encode(signature.replace("sha256=", "")),
     encoder.encode(body)
   );
 
