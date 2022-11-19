@@ -19,6 +19,8 @@ export const onRequest: PagesFunction<{
   }
   const body = await request.clone().text();
 
+  console.log(env.BLOG_WEBHOOK_SECRET);
+
   const verified = await verify(
     env.BLOG_WEBHOOK_SECRET,
     body,
@@ -53,15 +55,3 @@ const pushEventSchema = z.object({
     })
   ),
 });
-
-function hexToUInt8Array(string: string) {
-  // convert string to pairs of 2 characters
-  const pairs = string.match(/[\dA-F]{2}/gi) as RegExpMatchArray;
-
-  // convert the octets to integers
-  const integers = pairs.map(function (s) {
-    return parseInt(s, 16);
-  });
-
-  return new Uint8Array(integers);
-}
