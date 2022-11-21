@@ -21,11 +21,7 @@ export const onRequest: PagesFunction<{
 
   console.log(env.BLOG_WEBHOOK_SECRET);
 
-  const verified = await verify(
-    env.BLOG_WEBHOOK_SECRET,
-    body,
-    signature.slice("sha256=".length)
-  );
+  const verified = await verify(env.BLOG_WEBHOOK_SECRET, body, signature);
 
   if (!verified) {
     return new Response("Not authorised", { status: 403 });
