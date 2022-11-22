@@ -4,35 +4,31 @@ import { Kysely } from "kysely";
 import { D1Dialect } from "kysely-d1";
 import { z } from "zod";
 
-const blogPostTagsSchema = z.array(z.string());
-const blogPostStatusSchema = z.union([
+const frontMatterTagsSchema = z.array(z.string());
+const frontMatterStatusSchema = z.union([
   z.literal("unlisted"),
   z.literal("published"),
 ]);
 
-const githubBlogDataSchema = z.object({
+const frontMatterSchema = z.object({
   title: z.string(),
   createdAt: z.string(),
-  tags: blogPostTagsSchema.default([]),
-  path: z.string(),
-  status: blogPostStatusSchema.default("published"),
+  tags: frontMatterTagsSchema.default([]),
+  slug: z.string(),
+  status: frontMatterStatusSchema.default("published"),
 });
 
-const manifestSchema = z.object({
-  posts: z.record(githubBlogDataSchema),
-});
+interface PostMeta extends z.TypeOf<typeof frontMatterSchema> {
+  path: string;
+}
 
-type BlogPostListEntry = Omit<z.TypeOf<typeof githubBlogDataSchema>, "path"> & {
-  slug: string;
-};
-
-interface BlogPost extends BlogPostListEntry {
+interface BlogPost extends PostMeta {
   content: string;
 }
 
 export interface BlogData {
   getPost: (slug: string) => Promise<BlogPost | null>;
-  listAllPosts: () => Promise<BlogPostListEntry[]>;
+  listAllPosts: () => Promise<PostMeta[]>;
 }
 
 type GitHubClient = ReturnType<
@@ -52,34 +48,45 @@ export class GitHubBlogData implements BlogData {
   }
 
   async getPost(slug: string) {
-    const { posts } = await this.#getManifest();
-    const post = posts[slug];
-
-    if (!post) {
-      return null;
-    }
-
-    const content = await this.#getRawFileContents(`posts/${post.path}`);
-
-    return {
-      ...post,
-      slug,
-      content,
-    };
+    return (
+      (await this.#listAllPostsWithContents()).find(
+        (post) => post.slug === slug
+      ) ?? null
+    );
   }
 
   async listAllPosts() {
-    const { posts } = await this.#getManifest();
-
-    return Object.entries(posts)
-      .filter(([, post]) => post.status === "published")
-      .map(([slug, post]) => ({ ...post, slug }));
+    return (await this.#listAllPostsWithContents()).map(
+      ({ content, ...meta }) => meta
+    );
   }
 
-  async #getManifest() {
-    const contents = await this.#getRawFileContents("manifest.json");
+  async getPostByPath(path: string) {
+    const content = await this.#getRawFileContents(path);
+    const fontMatter = parseFrontMatter(content);
+    return {
+      path,
+      content: content.slice(fontMatter.contentStart),
+      ...fontMatter.attributes,
+    };
+  }
 
-    return manifestSchema.parse(JSON.parse(contents));
+  async #listAllPostsWithContents() {
+    const result = await this.#gh(`GET /repos/{owner}/{repo}/contents/posts/`, {
+      owner: "tom-sherman",
+      repo: "blog",
+    });
+
+    const files = z
+      .array(
+        z.object({
+          type: z.literal("file"),
+          path: z.string(),
+        })
+      )
+      .parse(result.data);
+
+    return Promise.all(files.map(({ path }) => this.getPostByPath(path)));
   }
 
   async #getRawFileContents(path: string) {
@@ -119,6 +126,7 @@ export interface BlogPostsTable {
   LastModifiedAt: ColumnType<string>;
   Status: ColumnType<string>;
   Tags: ColumnType<string>;
+  Path: ColumnType<string>;
 }
 
 type BlogPostRow = {
@@ -167,8 +175,9 @@ export class D1BlogData implements BlogData {
     return posts.map(mapBlogPostRowToBlogPost);
   }
 
-  async upsertPost(post: BlogPost & { slug: string }) {
-    const values = {
+  // TODO: This should be a stored procedure to prevent concurrency bugs that could happen between deleting and inserting
+  async upsertPosts(...posts: BlogPost[]) {
+    const values = posts.map((post) => ({
       Slug: post.slug,
       Title: post.title,
       Content: post.content,
@@ -176,23 +185,68 @@ export class D1BlogData implements BlogData {
       LastModifiedAt: new Date().toISOString(),
       Status: post.status,
       Tags: JSON.stringify(post.tags),
-    };
+      Path: post.path,
+    }));
 
     await this.#db
-      .insertInto("BlogPosts")
-      .values(values)
-      .onDuplicateKeyUpdate({ ...values, Slug: undefined })
+      .deleteFrom("BlogPosts")
+      .where(
+        "Path",
+        "in",
+        posts.map((p) => p.path)
+      )
       .execute();
+
+    await this.#db.insertInto("BlogPosts").values(values).execute();
+  }
+
+  async deletePostsByPath(...paths: string[]) {
+    await this.#db.deleteFrom("BlogPosts").where("Path", "in", paths).execute();
   }
 }
 
 function mapBlogPostRowToBlogPost(selection: BlogPostRow) {
   return {
     slug: selection.Slug,
+    path: selection.Path,
     title: selection.Title,
     createdAt: selection.CreatedAt,
     content: selection.Content,
-    status: blogPostStatusSchema.parse(selection.Status),
-    tags: blogPostTagsSchema.parse(JSON.parse(selection.Tags)),
+    status: frontMatterStatusSchema.parse(selection.Status),
+    tags: frontMatterTagsSchema.parse(JSON.parse(selection.Tags)),
+  };
+}
+
+const frontMatterRe = /^---$(?<frontMatter>.*?)^---$/ms;
+const frontMatterKeyValueRe = /^(?<key>[^:]+):(?<value>.*)$/m;
+function parseFrontMatter(input: string) {
+  const match = input.match(frontMatterRe);
+  const frontMatterContent = match?.groups?.frontMatter?.trim();
+
+  if (frontMatterContent == null) {
+    throw new Error("Failed to parse front matter");
+  }
+
+  const contentStart = 2 * "---".length + frontMatterContent.length;
+
+  const frontMatter = Object.fromEntries(
+    frontMatterContent.split("\n").map((line, index) => {
+      const match = line.match(frontMatterKeyValueRe);
+      const key = match?.groups?.key;
+      const value = match?.groups?.value;
+
+      if (!key || !value) {
+        throw new Error(
+          `Failed to parse front matter at line ${index + 1}: "${line}"`
+        );
+      }
+
+      return [key, JSON.parse(value)];
+    })
+  );
+
+  return {
+    contentStart,
+    attributes: frontMatterSchema.parse(frontMatter),
   };
 }

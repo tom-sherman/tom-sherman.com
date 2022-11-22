@@ -1,15 +1,19 @@
 import { z } from "zod";
 import { verify } from "@octokit/webhooks-methods";
+import { createD1Kysely, D1BlogData, GitHubBlogData } from "~/blog-data.server";
+import { request as githubRequest } from "@octokit/request";
 
 export const onRequest: PagesFunction<{
   BLOG_WEBHOOK_SECRET: string;
+  DB: D1Database;
+  GITHUB_TOKEN: string;
 }> = async ({ request, env }) => {
   if (request.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
 
   const signature = request.headers.get("x-hub-signature-256");
-  console.log("signature", signature);
+
   if (!signature) {
     return new Response("Missing signature", { status: 400 });
   }
@@ -31,14 +35,53 @@ export const onRequest: PagesFunction<{
   if (!parseResult.success) {
     return new Response("Invalid payload", { status: 400 });
   }
-  const event = parseResult.data;
 
-  if (signature) console.log("Incoming webook");
-  console.log(request.url);
-  console.log(event);
+  const changes = flattenChanges(parseResult.data);
+  const db = new D1BlogData(createD1Kysely(env.DB));
+  const github = new GitHubBlogData(
+    githubRequest.defaults({
+      headers: {
+        authorization: `token ${env.GITHUB_TOKEN}`,
+        accept: "application/vnd.github.v3+json",
+      },
+    })
+  );
+
+  console.log("Processing changes", changes);
+
+  // The following is not parrelised in case a file exists in both filesToAddOrModify and filesToRemove
+  // Running this serially ensures that the database always ends up in a consistent state given the same push event
+  await db.deletePostsByPath(...changes.filesToRemove);
+  const postsToUpsert = await Promise.all(
+    changes.filesToAddOrModify.map((path) => github.getPostByPath(path))
+  );
+  await db.upsertPosts(...postsToUpsert);
 
   return new Response("OK", { status: 200 });
 };
+
+function flattenChanges(event: PushEvent) {
+  const filesToAddOrModify = new Set<string>();
+  const filesToRemove = new Set<string>();
+
+  for (const commit of event.commits) {
+    for (const file of commit.added.concat(commit.modified)) {
+      filesToAddOrModify.add(file);
+    }
+
+    for (const file of commit.removed) {
+      filesToRemove.add(file);
+      filesToAddOrModify.delete(file);
+    }
+  }
+
+  return {
+    filesToAddOrModify: [...filesToAddOrModify],
+    filesToRemove: [...filesToRemove],
+  };
+}
+
+type PushEvent = z.infer<typeof pushEventSchema>;
 
 const pushEventSchema = z.object({
   ref: z.string(),

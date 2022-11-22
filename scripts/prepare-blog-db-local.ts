@@ -67,6 +67,7 @@ async function main() {
           LastModifiedAt: new Date().toISOString(),
           Status: post.status,
           Tags: JSON.stringify(post.tags),
+          Path: post.path,
         }))
       )
       .execute();
