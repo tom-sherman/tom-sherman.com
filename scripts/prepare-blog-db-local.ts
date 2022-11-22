@@ -30,7 +30,7 @@ async function main() {
       Title TEXT NOT NULL,
       Content TEXT NOT NULL,
       CreatedAt TEXT NOT NULL,
-      LastModifiedAt TEXT NOT NULL,
+      LastModifiedAt TEXT,
       Status TEXT NOT NULL,
       Tags TEXT NOT NULL,
       Path TEXT NOT NULL
@@ -65,7 +65,6 @@ async function main() {
           Title: post.title,
           Content: post.content,
           CreatedAt: post.createdAt,
-          LastModifiedAt: new Date().toISOString(),
           Status: post.status,
           Tags: JSON.stringify(post.tags),
           Path: post.path,

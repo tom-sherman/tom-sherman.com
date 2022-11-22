@@ -1,5 +1,5 @@
 import type { request as githubRequest } from "@octokit/request";
-import type { ColumnType, SelectType } from "kysely";
+import type { SelectType } from "kysely";
 import { Kysely } from "kysely";
 import { D1Dialect } from "kysely-d1";
 import { z } from "zod";
@@ -82,6 +82,7 @@ export class GitHubBlogData implements BlogData {
         z.object({
           type: z.literal("file"),
           path: z.string(),
+          sha: z.string(),
         })
       )
       .parse(result.data);
@@ -119,14 +120,14 @@ function parseContentsResponse(res: ContentsApiResponse) {
 }
 
 export interface BlogPostsTable {
-  Slug: ColumnType<string>;
-  Title: ColumnType<string>;
-  Content: ColumnType<string>;
-  CreatedAt: ColumnType<string>;
-  LastModifiedAt: ColumnType<string>;
-  Status: ColumnType<string>;
-  Tags: ColumnType<string>;
-  Path: ColumnType<string>;
+  Slug: string;
+  Title: string;
+  Content: string;
+  CreatedAt: string;
+  LastModifiedAt: string | null;
+  Status: string;
+  Tags: string;
+  Path: string;
 }
 
 type BlogPostRow = {
@@ -182,7 +183,6 @@ export class D1BlogData implements BlogData {
       Title: post.title,
       Content: post.content,
       CreatedAt: post.createdAt,
-      LastModifiedAt: new Date().toISOString(),
       Status: post.status,
       Tags: JSON.stringify(post.tags),
       Path: post.path,
