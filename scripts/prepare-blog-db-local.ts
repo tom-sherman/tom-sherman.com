@@ -32,7 +32,8 @@ async function main() {
       CreatedAt TEXT NOT NULL,
       LastModifiedAt TEXT NOT NULL,
       Status TEXT NOT NULL,
-      Tags TEXT NOT NULL
+      Tags TEXT NOT NULL,
+      Path TEXT NOT NULL
     );
   `.execute(db);
 
