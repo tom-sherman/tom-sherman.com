@@ -227,7 +227,7 @@ function parseFrontMatter(input: string) {
     throw new Error("Failed to parse front matter");
   }
 
-  const contentStart = 2 * "---".length + frontMatterContent.length;
+  const contentStart = 2 * "---\n".length + frontMatterContent.length;
 
   const frontMatter = Object.fromEntries(
     frontMatterContent.split("\n").map((line, index) => {
