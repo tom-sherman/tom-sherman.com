@@ -15,7 +15,7 @@
     "jsx": "react-jsx",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "target": "ES2019",
+    "target": "ES2020",
     "strict": true,
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
@@ -25,6 +25,8 @@
         "./app/*"
       ]
     },
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "noUncheckedIndexedAccess": true,
     // Remix takes care of building everything in `remix build`.
     "noEmit": true

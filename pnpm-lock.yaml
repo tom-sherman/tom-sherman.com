@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@cloudflare/workers-types': ^3.18.0
   '@octokit/request': ^6.2.2
+  '@octokit/webhooks-methods': ^3.0.1
   '@picocss/pico': ^1.5.6
   '@remix-run/cloudflare': 0.0.0-experimental-9b7f37c9a
   '@remix-run/cloudflare-pages': 0.0.0-experimental-9b7f37c9a
@@ -13,8 +14,11 @@ specifiers:
   '@types/react': ^18.0.25
   '@types/react-dom': ^18.0.9
   cross-env: ^7.0.3
+  dotenv: ^16.0.3
   eslint: ^8.27.0
   isbot: ^3.6.5
+  kysely: ^0.22.0
+  kysely-d1: ^0.0.5
   marked: ^4.2.2
   npm-run-all: ^4.1.5
   prettier: ^2.7.1
@@ -26,12 +30,15 @@ specifiers:
 
 dependencies:
   '@octokit/request': 6.2.2
+  '@octokit/webhooks-methods': 3.0.1
   '@picocss/pico': 1.5.6
   '@remix-run/cloudflare': 0.0.0-experimental-9b7f37c9a_dp7lsxfcjoxmh2gy56a7syibgu
   '@remix-run/cloudflare-pages': 0.0.0-experimental-9b7f37c9a_dp7lsxfcjoxmh2gy56a7syibgu
   '@remix-run/react': 0.0.0-experimental-9b7f37c9a_biqbaboplfbrettd7655fr4n2y
   cross-env: 7.0.3
   isbot: 3.6.5
+  kysely: 0.22.0
+  kysely-d1: 0.0.5_kysely@0.22.0
   marked: 4.2.2
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -44,6 +51,7 @@ devDependencies:
   '@types/marked': 4.0.7
   '@types/react': 18.0.25
   '@types/react-dom': 18.0.9
+  dotenv: 16.0.3
   eslint: 8.27.0
   npm-run-all: 4.1.5
   prettier: 2.7.1
@@ -1750,6 +1758,11 @@ packages:
     resolution: {integrity: sha512-65/TPpOJP1i3K4lBJMnWqPUJ6zuOtzhtagDvydAWbEXpbFYA0oMKKyLb95NFZZP0lSh/4b6K+DQlzvYQJQQePg==}
     dependencies:
       '@octokit/openapi-types': 14.0.0
+    dev: false
+
+  /@octokit/webhooks-methods/3.0.1:
+    resolution: {integrity: sha512-XftYVcBxtzC2G05kdBNn9IYLtQ+Cz6ufKkjZd0DU/qGaZEFTPzM2OabXAWG5tvL0q/I+Exio1JnRiPfetiMSEw==}
+    engines: {node: '>= 14'}
     dev: false
 
   /@picocss/pico/1.5.6:
@@ -5309,6 +5322,19 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
     dev: true
+
+  /kysely-d1/0.0.5_kysely@0.22.0:
+    resolution: {integrity: sha512-cot0gORL2ZoNvsy+9jSeXKcKnoSTWLb+iZx73qoojD5z56mQ80rgcXwk2Rtg53sxAWyp9cM5TApQVL4wwpmQgA==}
+    peerDependencies:
+      kysely: '*'
+    dependencies:
+      kysely: 0.22.0
+    dev: false
+
+  /kysely/0.22.0:
+    resolution: {integrity: sha512-ZE3qWtnqLOalodzfK5QUEcm7AEulhxsPNuKaGFsC3XiqO92vMLm+mAHk/NnbSIOtC4RmGm0nsv700i8KDp1gfQ==}
+    engines: {node: '>=14.0.0'}
+    dev: false
 
   /language-subtag-registry/0.3.22:
     resolution: {integrity: sha512-tN0MCzyWnoz/4nHS6uxdlFWoUZT7ABptwKPQ52Ea7URk6vll88bWBVhodtnlfEuCcKWNGoc+uGbw1cwa9IKh/w==}

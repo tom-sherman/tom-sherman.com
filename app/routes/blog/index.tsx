@@ -1,10 +1,10 @@
 import type { LoaderArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
-import { BlogData } from "~/blog-data.server";
+import { D1BlogData, createD1Kysely } from "~/blog-data.server";
 
 export async function loader({ context }: LoaderArgs) {
-  const blog = new BlogData(context as any);
+  const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
 
   return json({
     posts: await blog.listAllPosts(),

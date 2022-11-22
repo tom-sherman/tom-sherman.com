@@ -1,74 +1,93 @@
-import { request as githubRequest } from "@octokit/request";
-import { marked } from "marked";
+import type { request as githubRequest } from "@octokit/request";
+import type { SelectType } from "kysely";
+import { Kysely } from "kysely";
+import { D1Dialect } from "kysely-d1";
 import { z } from "zod";
 
-export class BlogData {
-  #gh: ReturnType<
-    typeof githubRequest.defaults<{
-      headers: {
-        authorization: string;
-        accept: string;
-      };
-    }>
-  >;
+const frontMatterTagsSchema = z.array(z.string());
+const frontMatterStatusSchema = z.union([
+  z.literal("unlisted"),
+  z.literal("published"),
+]);
 
-  constructor(context: ExecutionContext) {
-    const githubFetchWithCache: typeof globalThis.fetch = async (
-      request,
-      init
-    ) => {
-      const cache = await caches.open("post_cache");
-      let response = await cache.match(request);
+const frontMatterSchema = z.object({
+  title: z.string(),
+  createdAt: z.string(),
+  tags: frontMatterTagsSchema.default([]),
+  slug: z.string(),
+  status: frontMatterStatusSchema.default("published"),
+});
 
-      if (!response) {
-        response = await fetch(request, init);
-        response = new Response(response.body, response);
-        response.headers.set("Cache-Control", "s-maxage=60");
-        context.waitUntil(cache.put(request, response.clone()));
-      }
+interface PostMeta extends z.TypeOf<typeof frontMatterSchema> {
+  path: string;
+}
 
-      return response;
+interface BlogPost extends PostMeta {
+  content: string;
+}
+
+export interface BlogData {
+  getPost: (slug: string) => Promise<BlogPost | null>;
+  listAllPosts: () => Promise<PostMeta[]>;
+}
+
+type GitHubClient = ReturnType<
+  typeof githubRequest.defaults<{
+    headers: {
+      authorization: string;
+      accept: string;
     };
+  }>
+>;
 
-    this.#gh = githubRequest.defaults({
-      request: {
-        fetch: githubFetchWithCache,
-      },
-      headers: {
-        authorization: `token ${(context as any).env.GITHUB_TOKEN}`,
-        accept: "application/vnd.github.v3+json",
-      },
-    });
+export class GitHubBlogData implements BlogData {
+  #gh: GitHubClient;
+
+  constructor(gh: GitHubClient) {
+    this.#gh = gh;
   }
 
   async getPost(slug: string) {
-    const { posts } = await this.#getManifest();
-    const post = posts[slug];
-
-    if (!post) {
-      return null;
-    }
-
-    const content = await this.#getRawFileContents(`posts/${post.path}`);
-
-    return {
-      ...post,
-      content: marked(content),
-    };
+    return (
+      (await this.#listAllPostsWithContents()).find(
+        (post) => post.slug === slug
+      ) ?? null
+    );
   }
 
   async listAllPosts() {
-    const { posts } = await this.#getManifest();
-
-    return Object.entries(posts)
-      .filter(([, post]) => post.status === "published")
-      .map(([slug, post]) => ({ ...post, slug }));
+    return (await this.#listAllPostsWithContents()).map(
+      ({ content, ...meta }) => meta
+    );
   }
 
-  async #getManifest() {
-    const contents = await this.#getRawFileContents("manifest.json");
+  async getPostByPath(path: string) {
+    const content = await this.#getRawFileContents(path);
+    const fontMatter = parseFrontMatter(content);
+    return {
+      path,
+      content: content.slice(fontMatter.contentStart),
+      ...fontMatter.attributes,
+    };
+  }
 
-    return manifestSchema.parse(JSON.parse(contents));
+  async #listAllPostsWithContents() {
+    const result = await this.#gh(`GET /repos/{owner}/{repo}/contents/posts/`, {
+      owner: "tom-sherman",
+      repo: "blog",
+    });
+
+    const files = z
+      .array(
+        z.object({
+          type: z.literal("file"),
+          path: z.string(),
+          sha: z.string(),
+        })
+      )
+      .parse(result.data);
+
+    return Promise.all(files.map(({ path }) => this.getPostByPath(path)));
   }
 
   async #getRawFileContents(path: string) {
@@ -88,28 +107,146 @@ export class BlogData {
   }
 }
 
-const manifestSchema = z.object({
-  posts: z.record(
-    z.object({
-      title: z.string(),
-      createdAt: z.string(),
-      path: z.string(),
-      tags: z.array(z.string()).default([]),
-      status: z
-        .union([z.literal("unlisted"), z.literal("published")])
-        .default("published"),
-    })
-  ),
-});
-
 type ContentsApiResponse = Awaited<
   ReturnType<typeof githubRequest<"GET /repos/{owner}/{repo}/contents/{path}">>
 >;
 
 function parseContentsResponse(res: ContentsApiResponse) {
   if (typeof res.data === "string") {
-    return res.data;
+    return res.data as string;
   }
 
   throw new Error("Failed to get contents");
+}
+
+export interface BlogPostsTable {
+  Slug: string;
+  Title: string;
+  Content: string;
+  CreatedAt: string;
+  LastModifiedAt: string | null;
+  Status: string;
+  Tags: string;
+  Path: string;
+}
+
+type BlogPostRow = {
+  [K in keyof BlogPostsTable]: SelectType<BlogPostsTable[K]>;
+};
+
+interface Database {
+  BlogPosts: BlogPostsTable;
+}
+
+export const createD1Kysely = (d1: D1Database) =>
+  new Kysely<Database>({
+    dialect: new D1Dialect({
+      database: d1,
+    }),
+  });
+
+export class D1BlogData implements BlogData {
+  #db: Kysely<Database>;
+
+  constructor(db: Kysely<Database>) {
+    this.#db = db;
+  }
+
+  async getPost(slug: string) {
+    const post = await this.#db
+      .selectFrom("BlogPosts")
+      .selectAll()
+      .where("Slug", "=", slug)
+      .executeTakeFirst();
+
+    if (!post) {
+      return null;
+    }
+
+    return mapBlogPostRowToBlogPost(post);
+  }
+
+  async listAllPosts() {
+    const posts = await this.#db
+      .selectFrom("BlogPosts")
+      .selectAll()
+      .where("Status", "=", "published")
+      .execute();
+
+    return posts.map(mapBlogPostRowToBlogPost);
+  }
+
+  // TODO: This should be a stored procedure to prevent concurrency bugs that could happen between deleting and inserting
+  async upsertPosts(...posts: BlogPost[]) {
+    const values = posts.map((post) => ({
+      Slug: post.slug,
+      Title: post.title,
+      Content: post.content,
+      CreatedAt: post.createdAt,
+      Status: post.status,
+      Tags: JSON.stringify(post.tags),
+      Path: post.path,
+    }));
+
+    await this.#db
+      .deleteFrom("BlogPosts")
+      .where(
+        "Path",
+        "in",
+        posts.map((p) => p.path)
+      )
+      .execute();
+
+    await this.#db.insertInto("BlogPosts").values(values).execute();
+  }
+
+  async deletePostsByPath(...paths: string[]) {
+    await this.#db.deleteFrom("BlogPosts").where("Path", "in", paths).execute();
+  }
+}
+
+function mapBlogPostRowToBlogPost(selection: BlogPostRow) {
+  return {
+    slug: selection.Slug,
+    path: selection.Path,
+    title: selection.Title,
+    createdAt: selection.CreatedAt,
+    content: selection.Content,
+    status: frontMatterStatusSchema.parse(selection.Status),
+    tags: frontMatterTagsSchema.parse(JSON.parse(selection.Tags)),
+  };
+}
+
+const frontMatterRe = /^---$(?<frontMatter>.*?)^---$/ms;
+const frontMatterKeyValueRe = /^(?<key>[^:]+):(?<value>.*)$/m;
+function parseFrontMatter(input: string) {
+  const match = input.match(frontMatterRe);
+  const frontMatterContent = match?.groups?.frontMatter?.trim();
+
+  if (frontMatterContent == null) {
+    throw new Error("Failed to parse front matter");
+  }
+
+  const contentStart = 2 * "---".length + frontMatterContent.length;
+
+  const frontMatter = Object.fromEntries(
+    frontMatterContent.split("\n").map((line, index) => {
+      const match = line.match(frontMatterKeyValueRe);
+      const key = match?.groups?.key;
+      const value = match?.groups?.value;
+
+      if (!key || !value) {
+        throw new Error(
+          `Failed to parse front matter at line ${index + 1}: "${line}"`
+        );
+      }
+
+      return [key, JSON.parse(value)];
+    })
+  );
+
+  return {
+    contentStart,
+    attributes: frontMatterSchema.parse(frontMatter),
+  };
 }

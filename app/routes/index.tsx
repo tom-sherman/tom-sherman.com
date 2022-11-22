@@ -3,12 +3,12 @@ import { defer } from "@remix-run/cloudflare";
 import { Link, useLoaderData, Await } from "@remix-run/react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-import { BlogData } from "~/blog-data.server";
+import { createD1Kysely, D1BlogData } from "~/blog-data.server";
 import { Copyright } from "~/components/copyright";
 import { MASTODON_URL } from "~/constants";
 
 export async function loader({ context }: LoaderArgs) {
-  const blog = new BlogData(context as any);
+  const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
 
   return defer({
     recentBlogPosts: blog.listAllPosts().then((posts) =>
@@ -41,23 +41,28 @@ export default function Index() {
 
         <h2>Recent blog posts</h2>
 
-        <Link to="/blog">View all blog posts</Link>
-        <div className="grid">
-          <Suspense fallback={<article aria-busy />}>
-            <Await resolve={recentBlogPosts}>
-              {(posts) =>
-                posts.map((post) => (
-                  <article key={post.url}>
-                    <header>{post.createdAt}</header>
-                    <Link to={post.url}>
-                      <h4>{post.title}</h4>
-                    </Link>
-                  </article>
-                ))
-              }
-            </Await>
-          </Suspense>
-        </div>
+        <Suspense fallback={<article aria-busy />}>
+          <Await
+            resolve={recentBlogPosts}
+            errorElement={<p>Oops! Failed to load blog posts</p>}
+          >
+            {(posts) => (
+              <>
+                <Link to="/blog">View all blog posts</Link>
+                <div className="grid">
+                  {posts.map((post) => (
+                    <article key={post.url}>
+                      <header>{post.createdAt}</header>
+                      <Link to={post.url}>
+                        <h4>{post.title}</h4>
+                      </Link>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
+          </Await>
+        </Suspense>
 
         <h2>Projects</h2>
 
