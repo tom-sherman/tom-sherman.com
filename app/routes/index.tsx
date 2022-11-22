@@ -41,15 +41,15 @@ export default function Index() {
 
         <h2>Recent blog posts</h2>
 
-        <div className="grid">
-          <Suspense fallback={<article aria-busy />}>
-            <Await
-              resolve={recentBlogPosts}
-              errorElement={<p>Oops! Failed to load blog posts</p>}
-            >
-              {(posts) => (
-                <>
-                  <Link to="/blog">View all blog posts</Link>
+        <Suspense fallback={<article aria-busy />}>
+          <Await
+            resolve={recentBlogPosts}
+            errorElement={<p>Oops! Failed to load blog posts</p>}
+          >
+            {(posts) => (
+              <>
+                <Link to="/blog">View all blog posts</Link>
+                <div className="grid">
                   {posts.map((post) => (
                     <article key={post.url}>
                       <header>{post.createdAt}</header>
@@ -58,11 +58,11 @@ export default function Index() {
                       </Link>
                     </article>
                   ))}
-                </>
-              )}
-            </Await>
-          </Suspense>
-        </div>
+                </div>
+              </>
+            )}
+          </Await>
+        </Suspense>
 
         <h2>Projects</h2>
 
