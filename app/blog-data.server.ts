@@ -181,6 +181,14 @@ export class D1BlogData implements BlogData {
     return posts.map(mapBlogPostRowToBlogPost);
   }
 
+  async listPostsByTag(tag: string) {
+    const posts = await this.#allPostsQuery()
+      .where("Tags", "like", `%"${tag}"%`)
+      .execute();
+
+    return posts.map(mapBlogPostRowToBlogPost);
+  }
+
   #allPostsQuery() {
     return this.#db
       .selectFrom("BlogPosts")

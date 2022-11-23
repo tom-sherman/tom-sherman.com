@@ -1,6 +1,6 @@
 import type { LoaderArgs, SerializeFrom } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { marked } from "marked";
 import { D1BlogData, createD1Kysely } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
@@ -45,10 +45,10 @@ export default function BlogPost() {
     <>
       <div dangerouslySetInnerHTML={{ __html: post.content }} />
       <ul className="chip-list blog-tags">
-        {post.tags.map((tag, index) => (
-          <Chip key={index} as="li">
-            {tag}
-          </Chip>
+        {post.tags.map((tag) => (
+          <Link to={`/blog/tags/${tag}`} key={tag}>
+            <Chip as="li">{tag}</Chip>
+          </Link>
         ))}
       </ul>
     </>

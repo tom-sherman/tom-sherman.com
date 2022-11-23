@@ -2,6 +2,7 @@ import type { LoaderArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { D1BlogData, createD1Kysely } from "~/blog-data.server";
+import { PostList } from "~/components/post-list";
 
 export async function loader({ context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -26,13 +27,7 @@ export default function BlogIndex() {
         or <a href="https://twitter.com/tomus_sherman">DM me</a>!
       </p>
 
-      <ul>
-        {posts.map((post) => (
-          <li key={post.slug}>
-            <Link to={`/blog/${post.slug}`}>{post.title}</Link>
-          </li>
-        ))}
-      </ul>
+      <PostList posts={posts} />
     </>
   );
 }
