@@ -60,11 +60,11 @@ export default function BlogPost() {
         dangerouslySetInnerHTML={{
           __html: marked(post.content, {
             highlight: (code, lang) => {
-              const grammar = languages[lang];
+              let grammar = languages[lang] ?? languages.plaintext;
               if (!grammar) {
-                return code;
+                throw new Error(`Unknown language: ${lang}`);
               }
-              return highlight(code, languages[lang]!, lang);
+              return highlight(code, grammar, lang);
             },
           }),
         }}
