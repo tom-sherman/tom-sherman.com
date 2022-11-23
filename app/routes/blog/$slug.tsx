@@ -23,7 +23,7 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({
     post: {
       title: post.title,
-      content: marked(post.content),
+      content: post.content,
       tags: post.tags,
     },
   });
@@ -43,7 +43,7 @@ export default function BlogPost() {
 
   return (
     <>
-      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+      <div dangerouslySetInnerHTML={{ __html: marked(post.content) }} />
       <ul className="chip-list blog-tags">
         {post.tags.map((tag) => (
           <Link to={`/blog/tags/${tag}`} key={tag}>

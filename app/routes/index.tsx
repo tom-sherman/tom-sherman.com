@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { createD1Kysely, D1BlogData } from "~/blog-data.server";
 import { Copyright } from "~/components/copyright";
+import { PostTitle } from "~/components/post-list";
 import { MASTODON_URL } from "~/constants";
 
 export async function loader({ context }: LoaderArgs) {
@@ -48,7 +49,7 @@ export default function Index() {
                     <article key={post.url}>
                       <header>{post.createdAt}</header>
                       <Link to={post.url}>
-                        <h4>{post.title}</h4>
+                        <PostTitle as="h4" title={post.title} />
                       </Link>
                     </article>
                   ))}
