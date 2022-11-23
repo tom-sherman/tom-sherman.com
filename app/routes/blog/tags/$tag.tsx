@@ -15,8 +15,6 @@ export const loader = async ({ params, context }: LoaderArgs) => {
 
   const posts = await blog.listPostsByTag(tag);
 
-  console.log(posts);
-
   return json({
     posts,
     tag,
