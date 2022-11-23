@@ -9,7 +9,7 @@ import { marked } from "marked";
 import { highlight, languages } from "prismjs";
 import { D1BlogData, createD1Kysely } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
-import prismThemeCss from "~/prism-atom-dark.css";
+import prismDarkThemeCss from "~/prism-atom-dark.css";
 
 export async function loader({ params, context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -47,7 +47,7 @@ export const meta = ({ data }: { data: SerializeFrom<typeof loader> }) => {
 export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
-    href: prismThemeCss,
+    href: prismDarkThemeCss,
   },
 ];
 
@@ -61,6 +61,10 @@ export default function BlogPost() {
           __html: marked(post.content, {
             highlight: (code, lang) => {
               console.log(lang);
+              const grammar = languages[lang];
+              if (!grammar) {
+                return code;
+              }
               return highlight(code, languages[lang]!, lang);
             },
           }),
