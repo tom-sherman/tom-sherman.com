@@ -56,9 +56,12 @@ export class GitHubBlogData implements BlogData {
   }
 
   async listAllPosts() {
-    return (await this.#listAllPostsWithContents()).map(
-      ({ content, ...meta }) => meta
-    );
+    return (await this.#listAllPostsWithContents())
+      .map(({ content, ...meta }) => meta)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
   }
 
   async getPostByPath(path: string) {
@@ -171,6 +174,7 @@ export class D1BlogData implements BlogData {
       .selectFrom("BlogPosts")
       .selectAll()
       .where("Status", "=", "published")
+      .orderBy("CreatedAt", "desc")
       .execute();
 
     return posts.map(mapBlogPostRowToBlogPost);
