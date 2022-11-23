@@ -60,16 +60,22 @@ export const onRequest: PagesFunction<{
   return new Response("OK", { status: 200 });
 };
 
+function pathIsPost(path: string) {
+  return path.startsWith("posts/") && path.endsWith(".md");
+}
+
 function flattenChanges(event: PushEvent) {
   const filesToAddOrModify = new Set<string>();
   const filesToRemove = new Set<string>();
 
   for (const commit of event.commits) {
     for (const file of commit.added.concat(commit.modified)) {
+      if (!pathIsPost(file)) continue;
       filesToAddOrModify.add(file);
     }
 
     for (const file of commit.removed) {
+      if (!pathIsPost(file)) continue;
       filesToRemove.add(file);
       filesToAddOrModify.delete(file);
     }
