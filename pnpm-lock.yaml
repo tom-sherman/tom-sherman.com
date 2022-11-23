@@ -11,6 +11,7 @@ specifiers:
   '@remix-run/eslint-config': ^1.7.5
   '@remix-run/react': 0.0.0-experimental-9b7f37c9a
   '@types/marked': ^4.0.7
+  '@types/prismjs': ^1.26.0
   '@types/react': ^18.0.25
   '@types/react-dom': ^18.0.9
   cross-env: ^7.0.3
@@ -22,6 +23,7 @@ specifiers:
   marked: ^4.2.2
   npm-run-all: ^4.1.5
   prettier: ^2.7.1
+  prismjs: ^1.29.0
   react: ^18.2.0
   react-dom: ^18.2.0
   typescript: ^4.8.4
@@ -40,6 +42,7 @@ dependencies:
   kysely: 0.22.0
   kysely-d1: 0.0.5_kysely@0.22.0
   marked: 4.2.2
+  prismjs: 1.29.0
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   zod: 3.19.1
@@ -49,6 +52,7 @@ devDependencies:
   '@remix-run/dev': 1.7.5_biqbaboplfbrettd7655fr4n2y
   '@remix-run/eslint-config': 1.7.5_u5s2ztivgin3yy4srvdhm3tgpm
   '@types/marked': 4.0.7
+  '@types/prismjs': 1.26.0
   '@types/react': 18.0.25
   '@types/react-dom': 18.0.9
   dotenv: 16.0.3
@@ -2108,6 +2112,10 @@ packages:
 
   /@types/node/18.11.9:
     resolution: {integrity: sha512-CRpX21/kGdzjOpFsZSkcrXMGIBWMGNIHXXBVFSH+ggkftxg+XYP20TESbh+zFvFj3EQOl5byk0HTRn1IL6hbqg==}
+    dev: true
+
+  /@types/prismjs/1.26.0:
+    resolution: {integrity: sha512-ZTaqn/qSqUuAq1YwvOFQfVW1AR/oQJlLSZVustdjwI+GZ8kr0MSHBj0tsXPW1EqHubx50gtBEjbPGsdZwQwCjQ==}
     dev: true
 
   /@types/prop-types/15.7.5:
@@ -6671,6 +6679,11 @@ packages:
     dependencies:
       parse-ms: 2.1.0
     dev: true
+
+  /prismjs/1.29.0:
+    resolution: {integrity: sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==}
+    engines: {node: '>=6'}
+    dev: false
 
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
