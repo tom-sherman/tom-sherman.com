@@ -23,8 +23,6 @@ export const onRequest: PagesFunction<{
   }
   const body = await request.clone().text();
 
-  console.log(env.BLOG_WEBHOOK_SECRET);
-
   const verified = await verify(env.BLOG_WEBHOOK_SECRET, body, signature);
 
   if (!verified) {
