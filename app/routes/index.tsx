@@ -11,22 +11,16 @@ export async function loader({ context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
 
   return defer({
-    recentBlogPosts: blog.listAllPosts().then((posts) =>
-      posts
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )
-        .slice(0, 3)
-        .map((post) => ({
-          title: post.title,
-          url: `/blog/${post.slug}`,
-          createdAt: new Intl.DateTimeFormat("en-GB", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }).format(new Date(post.createdAt)),
-        }))
+    recentBlogPosts: blog.list3RecentPosts().then((posts) =>
+      posts.map((post) => ({
+        title: post.title,
+        url: `/blog/${post.slug}`,
+        createdAt: new Intl.DateTimeFormat("en-GB", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(new Date(post.createdAt)),
+      }))
     ),
   });
 }

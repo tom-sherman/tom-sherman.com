@@ -170,14 +170,23 @@ export class D1BlogData implements BlogData {
   }
 
   async listAllPosts() {
-    const posts = await this.#db
+    const posts = await this.#allPostsQuery().execute();
+
+    return posts.map(mapBlogPostRowToBlogPost);
+  }
+
+  async list3RecentPosts() {
+    const posts = await this.#allPostsQuery().limit(3).execute();
+
+    return posts.map(mapBlogPostRowToBlogPost);
+  }
+
+  #allPostsQuery() {
+    return this.#db
       .selectFrom("BlogPosts")
       .selectAll()
       .where("Status", "=", "published")
-      .orderBy("CreatedAt", "desc")
-      .execute();
-
-    return posts.map(mapBlogPostRowToBlogPost);
+      .orderBy("CreatedAt", "desc");
   }
 
   // TODO: This should be a stored procedure to prevent concurrency bugs that could happen between deleting and inserting
