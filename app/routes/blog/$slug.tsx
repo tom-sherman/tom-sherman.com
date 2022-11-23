@@ -60,7 +60,10 @@ export default function BlogPost() {
         dangerouslySetInnerHTML={{
           __html: marked(post.content, {
             highlight: (code, lang) => {
-              console.log(lang);
+              if (lang === "ts") {
+                lang = "typescript";
+              }
+
               const grammar = languages[lang];
               if (!grammar) {
                 return code;
