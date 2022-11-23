@@ -8,6 +8,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import picoCss from "@picocss/pico/css/pico.min.css";
+import stylesCss from "./styles.css";
 import { MASTODON_URL } from "./constants";
 import { StrictMode } from "react";
 
@@ -31,6 +32,10 @@ export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
     href: picoCss,
+  },
+  {
+    rel: "stylesheet",
+    href: stylesCss,
   },
   {
     rel: "apple-touch-icon",

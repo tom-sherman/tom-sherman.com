@@ -1,0 +1,25 @@
+.chip {
+  display: inline-flex;
+  border-radius: 2em;
+  cursor: default;
+  padding: 0.2em 0.7em;
+  background-color: var(--code-background-color);
+}
+
+a > .chip {
+  color: inherit;
+  cursor: unset;
+}
+
+li.chip {
+  margin: 0;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 0.5em;
+}
