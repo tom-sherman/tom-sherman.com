@@ -275,10 +275,5 @@ function parseFrontMatter(input: string) {
 }
 
 export function renderPostToHtml(content: string) {
-  return marked(content, {
-    highlight: (code, lang) => {
-      const language = lang || "text";
-      return hljs.highlight(code, { language }).value;
-    },
-  });
+  return marked(content);
 }

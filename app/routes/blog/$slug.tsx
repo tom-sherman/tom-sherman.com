@@ -11,7 +11,8 @@ import {
   renderPostToHtml,
 } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
-import codeTheme from "~/code-theme.css";
+import { getHighlighter, setCDN } from "shiki";
+import { useLayoutEffect, useRef } from "react";
 
 export async function loader({ params, context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -46,19 +47,44 @@ export const meta = ({ data }: { data: SerializeFrom<typeof loader> }) => {
   };
 };
 
-export const links: LinksFunction = () => [
-  {
-    rel: "stylesheet",
-    href: codeTheme,
-  },
-];
-
 export default function BlogPost() {
   const { post } = useLoaderData<typeof loader>();
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const codeBlocks = contentRef.current?.querySelectorAll("pre code");
+    if (!codeBlocks) return;
+
+    const languages = new Set(
+      Array.from(codeBlocks)
+        .map((block) => {
+          const lang = block.className.split("-")[1];
+          return lang;
+        })
+        .filter((lang): lang is string => !!lang)
+    );
+
+    setCDN("https://unpkg.com/shiki@0.11.1/");
+    getHighlighter({
+      theme: "nord",
+      langs: Array.from(languages) as any,
+    }).then((highlighter) => {
+      codeBlocks.forEach((code) => {
+        const lang = code.className.split("-")[1];
+        code.parentElement!.outerHTML = highlighter.codeToHtml(
+          code.textContent || "",
+          {
+            lang,
+          }
+        );
+      });
+    });
+  }, []);
 
   return (
     <>
       <div
+        ref={contentRef}
         dangerouslySetInnerHTML={{
           __html: post.content,
         }}
