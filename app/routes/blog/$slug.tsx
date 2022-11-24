@@ -11,7 +11,7 @@ import {
   renderPostToHtml,
 } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
-import prismTheme from "~/prism-theme.css";
+import codeTheme from "~/code-theme.css";
 
 export async function loader({ params, context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -49,7 +49,7 @@ export const meta = ({ data }: { data: SerializeFrom<typeof loader> }) => {
 export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
-    href: prismTheme,
+    href: codeTheme,
   },
 ];
 

@@ -3,8 +3,7 @@ import type { SelectType } from "kysely";
 import { Kysely } from "kysely";
 import { D1Dialect } from "kysely-d1";
 import { marked } from "marked";
-import { highlight, languages } from "prismjs";
-import "prismjs/components/prism-typescript";
+import hljs from "highlight.js";
 import { z } from "zod";
 
 const frontMatterTagsSchema = z.array(z.string());
@@ -278,11 +277,8 @@ function parseFrontMatter(input: string) {
 export function renderPostToHtml(content: string) {
   return marked(content, {
     highlight: (code, lang) => {
-      let grammar = languages[lang] ?? languages.plaintext;
-      if (!grammar) {
-        throw new Error(`Unknown language: ${lang}`);
-      }
-      return highlight(code, grammar, lang);
+      const language = lang || "text";
+      return hljs.highlight(code, { language }).value;
     },
   });
 }
