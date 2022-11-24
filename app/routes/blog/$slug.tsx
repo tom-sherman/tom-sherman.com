@@ -5,9 +5,11 @@ import type {
 } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
-import { marked } from "marked";
-import { highlight, languages } from "prismjs";
-import { D1BlogData, createD1Kysely } from "~/blog-data.server";
+import {
+  D1BlogData,
+  createD1Kysely,
+  renderPostToHtml,
+} from "~/blog-data.server";
 import { Chip } from "~/components/chip";
 import prismTheme from "~/prism-theme.css";
 
@@ -29,7 +31,7 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({
     post: {
       title: post.title,
-      content: post.content,
+      content: renderPostToHtml(post.content),
       tags: post.tags,
     },
   });
@@ -58,15 +60,7 @@ export default function BlogPost() {
     <>
       <div
         dangerouslySetInnerHTML={{
-          __html: marked(post.content, {
-            highlight: (code, lang) => {
-              let grammar = languages[lang] ?? languages.plaintext;
-              if (!grammar) {
-                throw new Error(`Unknown language: ${lang}`);
-              }
-              return highlight(code, grammar, lang);
-            },
-          }),
+          __html: post.content,
         }}
       />
       <ul className="chip-list blog-tags">
