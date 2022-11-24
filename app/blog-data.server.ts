@@ -4,6 +4,7 @@ import { Kysely } from "kysely";
 import { D1Dialect } from "kysely-d1";
 import { marked } from "marked";
 import { highlight, languages } from "prismjs";
+import "prismjs/components/prism-typescript";
 import { z } from "zod";
 
 const frontMatterTagsSchema = z.array(z.string());
