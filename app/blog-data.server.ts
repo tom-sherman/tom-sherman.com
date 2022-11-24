@@ -2,6 +2,8 @@ import type { request as githubRequest } from "@octokit/request";
 import type { SelectType } from "kysely";
 import { Kysely } from "kysely";
 import { D1Dialect } from "kysely-d1";
+import { marked } from "marked";
+import hljs from "highlight.js";
 import { z } from "zod";
 
 const frontMatterTagsSchema = z.array(z.string());
@@ -270,4 +272,13 @@ function parseFrontMatter(input: string) {
     contentStart,
     attributes: frontMatterSchema.parse(frontMatter),
   };
+}
+
+export function renderPostToHtml(content: string) {
+  return marked(content, {
+    highlight: (code, lang) => {
+      const language = lang || "text";
+      return hljs.highlight(code, { language }).value;
+    },
+  });
 }

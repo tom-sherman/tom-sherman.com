@@ -1,9 +1,17 @@
-import type { LoaderArgs, SerializeFrom } from "@remix-run/cloudflare";
+import type {
+  LinksFunction,
+  LoaderArgs,
+  SerializeFrom,
+} from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
-import { marked } from "marked";
-import { D1BlogData, createD1Kysely } from "~/blog-data.server";
+import {
+  D1BlogData,
+  createD1Kysely,
+  renderPostToHtml,
+} from "~/blog-data.server";
 import { Chip } from "~/components/chip";
+import codeTheme from "~/code-theme.css";
 
 export async function loader({ params, context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -23,7 +31,7 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({
     post: {
       title: post.title,
-      content: post.content,
+      content: renderPostToHtml(post.content),
       tags: post.tags,
     },
   });
@@ -38,12 +46,23 @@ export const meta = ({ data }: { data: SerializeFrom<typeof loader> }) => {
   };
 };
 
+export const links: LinksFunction = () => [
+  {
+    rel: "stylesheet",
+    href: codeTheme,
+  },
+];
+
 export default function BlogPost() {
   const { post } = useLoaderData<typeof loader>();
 
   return (
     <>
-      <div dangerouslySetInnerHTML={{ __html: marked(post.content) }} />
+      <div
+        dangerouslySetInnerHTML={{
+          __html: post.content,
+        }}
+      />
       <ul className="chip-list blog-tags">
         {post.tags.map((tag) => (
           <Link to={`/blog/tags/${tag}`} key={tag}>
