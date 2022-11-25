@@ -8,7 +8,7 @@ import {
 } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
 import { getHighlighter, setCDN } from "shiki";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
 
 export async function loader({ params, context }: LoaderArgs) {
@@ -49,35 +49,24 @@ export default function BlogPost() {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useIsomorphicLayoutEffect(() => {
-    const codeBlocks = contentRef.current?.querySelectorAll("pre code");
-    if (!codeBlocks) return;
-
-    const codeBlocksArray = Array.from(codeBlocks);
-
-    const languages = new Set(
-      codeBlocksArray
-        .map((block) => {
-          const lang = block.className.split("-")[1];
-          return lang;
-        })
-        .filter((lang): lang is string => !!lang)
+    highlightBlocks(
+      contentRef.current!,
+      window.matchMedia("(prefers-color-scheme: dark)").matches
     );
+  }, []);
 
-    setCDN("https://unpkg.com/shiki@0.11.1/");
-    getHighlighter({
-      theme: "github-dark",
-      langs: Array.from(languages) as any,
-    }).then((highlighter) => {
-      codeBlocksArray.forEach((code) => {
-        const lang = code.className.split("-")[1];
-        const container = document.createElement("div");
-        container.innerHTML = highlighter.codeToHtml(code.textContent || "", {
-          lang,
-        });
+  useEffect(() => {
+    function changeListener(event: MediaQueryListEvent) {
+      highlightBlocks(contentRef.current!, event.matches);
+    }
 
-        code.replaceWith(container.querySelector("code")!);
-      });
-    });
+    const query = window.matchMedia("(prefers-color-scheme: dark)");
+
+    query.addEventListener("change", changeListener);
+
+    return () => {
+      query.removeEventListener("change", changeListener);
+    };
   }, []);
 
   return (
@@ -97,4 +86,38 @@ export default function BlogPost() {
       </ul>
     </>
   );
+}
+
+function highlightBlocks(container: HTMLElement, prefersDarkMode: boolean) {
+  const codeBlocks = container.querySelectorAll("pre code");
+
+  const codeBlocksArray = Array.from(codeBlocks);
+
+  const languages = new Set(
+    codeBlocksArray
+      .map((block) => {
+        const lang = block.className.split("-")[1];
+        return lang;
+      })
+      .filter((lang): lang is string => !!lang)
+  );
+
+  setCDN("https://unpkg.com/shiki@0.11.1/");
+  getHighlighter({
+    theme: prefersDarkMode ? "github-dark" : "github-light",
+    langs: Array.from(languages) as any,
+  }).then((highlighter) => {
+    codeBlocksArray.forEach((code) => {
+      const lang = code.className.split("-")[1];
+      const container = document.createElement("div");
+      container.innerHTML = highlighter.codeToHtml(code.textContent || "", {
+        lang,
+      });
+
+      const newCode = container.querySelector("code")!;
+      newCode.className = code.className;
+
+      code.replaceWith(newCode);
+    });
+  });
 }
