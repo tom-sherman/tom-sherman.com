@@ -55,8 +55,10 @@ export default function BlogPost() {
     const codeBlocks = contentRef.current?.querySelectorAll("pre code");
     if (!codeBlocks) return;
 
+    const codeBlocksArray = Array.from(codeBlocks);
+
     const languages = new Set(
-      Array.from(codeBlocks)
+      codeBlocksArray
         .map((block) => {
           const lang = block.className.split("-")[1];
           return lang;
@@ -66,17 +68,17 @@ export default function BlogPost() {
 
     setCDN("https://unpkg.com/shiki@0.11.1/");
     getHighlighter({
-      theme: "nord",
+      theme: "github-dark",
       langs: Array.from(languages) as any,
     }).then((highlighter) => {
-      codeBlocks.forEach((code) => {
+      codeBlocksArray.forEach((code) => {
         const lang = code.className.split("-")[1];
-        code.parentElement!.outerHTML = highlighter.codeToHtml(
-          code.textContent || "",
-          {
-            lang,
-          }
-        );
+        const container = document.createElement("div");
+        container.innerHTML = highlighter.codeToHtml(code.textContent || "", {
+          lang,
+        });
+
+        code.replaceWith(container.querySelector("code")!);
       });
     });
   }, []);
