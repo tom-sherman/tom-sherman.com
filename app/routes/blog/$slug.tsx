@@ -1,8 +1,4 @@
-import type {
-  LinksFunction,
-  LoaderArgs,
-  SerializeFrom,
-} from "@remix-run/cloudflare";
+import type { LoaderArgs, SerializeFrom } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import {
@@ -12,7 +8,8 @@ import {
 } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
 import { getHighlighter, setCDN } from "shiki";
-import { useLayoutEffect, useRef } from "react";
+import { useRef } from "react";
+import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
 
 export async function loader({ params, context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -51,7 +48,7 @@ export default function BlogPost() {
   const { post } = useLoaderData<typeof loader>();
   const contentRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const codeBlocks = contentRef.current?.querySelectorAll("pre code");
     if (!codeBlocks) return;
 
