@@ -22,6 +22,7 @@ export const meta: MetaFunction = () => ({
   "og:image": "/me.jpg",
   "msapplication-TileColor": "#9b4dca",
   "theme-color": "#9b4dca",
+  "twitter:domain": "tomsherman.com",
   "twitter:card": "summary",
   "twitter:site": "@tomus_sherman",
   "twitter:title": "Tom Sherman",
