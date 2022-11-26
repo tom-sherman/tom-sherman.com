@@ -1,6 +1,7 @@
 import type {
   LinksFunction,
   LoaderArgs,
+  MetaFunction,
   SerializeFrom,
 } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
@@ -42,11 +43,15 @@ export async function loader({ params, context }: LoaderArgs) {
   });
 }
 
-export const meta = ({ data }: { data: SerializeFrom<typeof loader> }) => {
+export const meta: MetaFunction = ({
+  data,
+}: {
+  data: SerializeFrom<typeof loader>;
+}) => {
   return {
     title: data.post.title,
     "og:title": data.post.title,
-    "og:description": "A blog post by Tom Sherman",
+    "og:description": null,
     "og:image": "/me.jpg",
   };
 };

@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/cloudflare";
+import type { LoaderArgs, MetaFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { D1BlogData, createD1Kysely } from "~/blog-data.server";
@@ -11,6 +11,10 @@ export async function loader({ context }: LoaderArgs) {
     posts: await blog.listAllPosts(),
   });
 }
+
+export const meta: MetaFunction = () => ({
+  description: "Tom Sherman's mostly incoherent ramblings.",
+});
 
 export default function BlogIndex() {
   const { posts } = useLoaderData<typeof loader>();
