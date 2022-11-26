@@ -62,37 +62,51 @@ export default function Index() {
         <h2>Projects</h2>
 
         <Project
-          name="Yet Another Javascript Minifier"
-          url="https://tom-sherman.github.io/yet-another-js-online-minifier/"
+          name="Serverless XState"
+          url="https://github.com/tom-sherman/serverless-xstate"
           description={
             <p>
-              There's a thousand of these available online but this one handles
-              massive files without hanging the browser and supports ES6.
+              An architecture and example implementation for building serverless
+              applications using{" "}
+              <a href="https://github.com/statelyai/xstate">XState</a>.
             </p>
           }
         />
         <Project
-          name="Orangutan"
-          url="https://github.com/tom-sherman/orangutan"
+          name="immurl"
+          url="https://github.com/tom-sherman/immurl"
           description={
             <p>
-              Written in Typescript, Orangutan is a lazy range and list library
-              for JavaScript. It's heavily inspired by Haskell's lists and range
-              syntax.
+              🔗 A tiny ({"<"} 500B), 0-dependency, immutable URL library,
+              backed by the native whatwg URL. 🎉 Now with immutable{" "}
+              <code>Headers</code> support!
             </p>
           }
         />
         <Project
-          name="CoffeeBird"
-          url="https://github.com/tom-sherman/coffeebird"
+          name="response-multipart"
+          url="https://github.com/tom-sherman/response-multipart"
           description={
-            <p>
-              RBLang is <a href="https://rainbird.ai">Rainbird</a>'s XML based
-              language which is used to define concepts, relationships, and
-              rules to solve complex decision making problems. CoffeeBird
-              replicates all of the features of RBLang without the visual noise
-              of XML.
-            </p>
+            <>
+              <p>
+                Standards-inspired <code>multipart/*</code> parsing. It's like
+                <code>response.text()</code> but for multipart bodies!
+              </p>
+              <ul>
+                <li>
+                  100% standards compliant and isomorphic. Use it in the
+                  browser, Cloudflare Workers, Deno, and whatever new JS
+                  environment was created last week
+                </li>
+                <li>
+                  Support all multipart bodies: <code>multipart/form-data</code>
+                  ,<code>multipart/mixed</code>, <code>multipart/digest</code>,
+                  and
+                  <code>multipart/parallel</code>
+                </li>
+                <li>Support nested multipart bodies</li>
+              </ul>
+            </>
           }
         />
       </main>
