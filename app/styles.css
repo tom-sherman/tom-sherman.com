@@ -2,6 +2,11 @@
   cursor: unset;
 }
 
+code,
+kbd {
+  padding: 0.25rem 0.5rem;
+}
+
 .chip {
   display: inline-flex;
   border-radius: 2em;
