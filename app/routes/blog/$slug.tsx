@@ -31,6 +31,7 @@ export async function loader({ params, context }: LoaderArgs) {
       title: post.title,
       content: renderPostToHtml(post.content),
       tags: post.tags,
+      createdAt: post.createdAt,
     },
   });
 }
@@ -71,6 +72,11 @@ export default function BlogPost() {
 
   return (
     <>
+      <small>
+        {new Intl.DateTimeFormat("en-GB", {
+          dateStyle: "long",
+        }).format(new Date(post.createdAt))}
+      </small>
       <div
         ref={contentRef}
         dangerouslySetInnerHTML={{
