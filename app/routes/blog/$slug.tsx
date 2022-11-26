@@ -1,4 +1,8 @@
-import type { LoaderArgs, SerializeFrom } from "@remix-run/cloudflare";
+import type {
+  LinksFunction,
+  LoaderArgs,
+  SerializeFrom,
+} from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import {
@@ -10,6 +14,8 @@ import { Chip } from "~/components/chip";
 import { getHighlighter, setCDN } from "shiki";
 import { useEffect, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
+
+const SHIKI_VERSION = "0.11.1";
 
 export async function loader({ params, context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -44,6 +50,15 @@ export const meta = ({ data }: { data: SerializeFrom<typeof loader> }) => {
     "og:image": "/me.jpg",
   };
 };
+
+export const links: LinksFunction = () => [
+  {
+    rel: "preload",
+    href: `https://unpkg.com/shiki@${SHIKI_VERSION}/dist/onig.wasm`,
+    as: "fetch",
+    crossOrigin: "anonymous",
+  },
+];
 
 export default function BlogPost() {
   const { post } = useLoaderData<typeof loader>();
@@ -109,7 +124,7 @@ function highlightBlocks(container: HTMLElement, prefersDarkMode: boolean) {
       .filter((lang): lang is string => !!lang)
   );
 
-  setCDN("https://unpkg.com/shiki@0.11.1/");
+  setCDN(`https://unpkg.com/shiki@${SHIKI_VERSION}/`);
   getHighlighter({
     theme: prefersDarkMode ? "github-dark" : "github-light",
     langs: Array.from(languages) as any,
