@@ -53,6 +53,8 @@ export const meta: MetaFunction = ({
     "og:title": data.post.title,
     "og:description": null,
     "og:image": "/me.jpg",
+    "og:type": "article",
+    author: "Tom Sherman",
   };
 };
 
