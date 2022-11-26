@@ -77,6 +77,7 @@ export default function BlogPost() {
           __html: post.content,
         }}
       />
+      <hr />
       <ul className="chip-list blog-tags">
         {post.tags.map((tag) => (
           <Link to={`/blog/tags/${tag}`} key={tag}>
