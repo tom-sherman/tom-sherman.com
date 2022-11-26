@@ -1,3 +1,7 @@
+:where(:root) {
+  cursor: unset;
+}
+
 .chip {
   display: inline-flex;
   border-radius: 2em;
