@@ -2,6 +2,68 @@
   cursor: unset;
 }
 
+.about-me {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0;
+  margin-left: var(--spacing);
+  margin-right: var(--spacing);
+  padding-top: var(--spacing);
+}
+
+.about-me h1 {
+  margin: 0;
+}
+
+.about-me ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.about-me ul li {
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.about-me li::after {
+  content: "";
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--color);
+  transition: width 0.3s;
+}
+
+.about-me ul li:last-child::after {
+  display: none;
+}
+
+.about-me li a {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.about-me a img {
+  height: 1.5rem;
+  /* Turns a black SVG #1095c1 */
+  filter: invert(44%) sepia(90%) saturate(3216%) hue-rotate(168deg)
+    brightness(96%) contrast(87%);
+}
+
+.about-me a img:hover {
+  /* Turns a black SVG #19b3e6 */
+  filter: invert(57%) sepia(98%) saturate(1420%) hue-rotate(157deg)
+    brightness(96%) contrast(88%);
+}
+
 code,
 kbd {
   padding: 0.25rem 0.5rem;

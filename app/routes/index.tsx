@@ -31,9 +31,8 @@ export default function Index() {
 
   return (
     <>
+      <Me />
       <main className="container">
-        <Me />
-
         <h2>Recent blog posts</h2>
 
         <Suspense fallback={<article aria-busy />}>
@@ -119,7 +118,7 @@ export default function Index() {
 
 function Me() {
   return (
-    <>
+    <section className="about-me">
       <img
         style={{ borderRadius: "50%", width: "10rem" }}
         src="/me.jpg"
@@ -128,27 +127,31 @@ function Me() {
       <h1>Tom Sherman</h1>
       <ul>
         <li>
-          <a href="https://twitter.com/tomus_sherman" rel="me">
-            Twitter @tomus_sherman
+          <a rel="me" href={MASTODON_URL} title="Mastodon">
+            <img src="/mastodon.svg" />
           </a>
         </li>
         <li>
-          <a href="https://github.com/tom-sherman" rel="me">
-            Github @tom-sherman
+          <a href="https://twitter.com/tomus_sherman" rel="me" title="Twitter">
+            <img src="/twitter.svg" />
           </a>
         </li>
         <li>
-          <a href="https://www.linkedin.com/in/tom-sherman-2a2aa0136/" rel="me">
-            LinkedIn - Tom Sherman
+          <a href="https://github.com/tom-sherman" rel="me" title="GitHub">
+            <img src="/github.svg" />
           </a>
         </li>
         <li>
-          <a rel="me" href={MASTODON_URL}>
-            Mastodon
+          <a
+            href="https://www.linkedin.com/in/tom-sherman-2a2aa0136/"
+            title="LinkedIn"
+            rel="me"
+          >
+            <img src="/linkedin.svg" />
           </a>
         </li>
       </ul>
-    </>
+    </section>
   );
 }
 
