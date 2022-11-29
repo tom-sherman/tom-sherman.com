@@ -31,7 +31,12 @@ export default function BlogIndex() {
         or <a href="https://twitter.com/tomus_sherman">DM me</a>!
       </p>
 
-      <PostList posts={posts} />
+      <PostList
+        posts={posts.map((post) => ({
+          ...post,
+          createdAt: new Date(post.createdAt),
+        }))}
+      />
     </>
   );
 }
