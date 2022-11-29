@@ -1,6 +1,6 @@
 import type { LoaderArgs, MetaFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Link, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { D1BlogData, createD1Kysely } from "~/blog-data.server";
 import { PostList } from "~/components/post-list";
 

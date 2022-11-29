@@ -15,6 +15,7 @@ import { Chip } from "~/components/chip";
 import { getHighlighter, setCDN } from "shiki";
 import { useEffect, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
+import readingTime from "reading-time";
 
 const SHIKI_VERSION = "0.11.1";
 
@@ -39,6 +40,7 @@ export async function loader({ params, context }: LoaderArgs) {
       content: renderPostToHtml(post.content),
       tags: post.tags,
       createdAt: post.createdAt,
+      readingTimeText: readingTime(post.content).text,
     },
   });
 }
@@ -98,7 +100,8 @@ export default function BlogPost() {
       <small>
         {new Intl.DateTimeFormat("en-GB", {
           dateStyle: "long",
-        }).format(new Date(post.createdAt))}
+        }).format(new Date(post.createdAt))}{" "}
+        - {post.readingTimeText}
       </small>
       <div
         ref={contentRef}
