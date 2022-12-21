@@ -54,7 +54,6 @@ export const meta: MetaFunction = ({
     title: data.post.title,
     "og:title": data.post.title,
     "og:description": null,
-    "og:image": null,
     "og:type": "article",
     author: "Tom Sherman",
     "twitter:card": "summary",
