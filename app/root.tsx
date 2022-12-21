@@ -1,4 +1,8 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/cloudflare";
+import type {
+  HeadersFunction,
+  LinksFunction,
+  MetaFunction,
+} from "@remix-run/cloudflare";
 import {
   Links,
   LiveReload,
@@ -61,6 +65,10 @@ export const links: LinksFunction = () => [
     href: MASTODON_URL,
   },
 ];
+
+export const headers: HeadersFunction = () => ({
+  "Content-Type": "text/html; charset=utf-8",
+});
 
 export default function App() {
   return (
