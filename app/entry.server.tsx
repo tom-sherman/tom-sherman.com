@@ -28,6 +28,9 @@ export default async function handleRequest(
       .filter(Boolean)
       .join(",")
   );
+  if (!responseHeaders.has("Content-Type")) {
+    responseHeaders.set("Content-Type", "text/html; charset=utf-8");
+  }
 
   const controller = new AbortController();
   let didError = false;

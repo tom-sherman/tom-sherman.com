@@ -66,10 +66,6 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export const headers: HeadersFunction = () => ({
-  "Content-Type": "text/html; charset=utf-8",
-});
-
 export default function App() {
   return (
     <StrictMode>
