@@ -17,7 +17,10 @@ const frontMatterSchema = z.object({
   tags: frontMatterTagsSchema.default([]),
   slug: z.string(),
   status: frontMatterStatusSchema.default("published"),
-  description: z.string().optional(),
+  description: z
+    .string()
+    .optional()
+    .transform((value) => value ?? null),
 });
 
 interface PostMeta extends z.TypeOf<typeof frontMatterSchema> {
@@ -133,6 +136,7 @@ export interface BlogPostsTable {
   Status: string;
   Tags: string;
   Path: string;
+  Description: string | null;
 }
 
 type BlogPostRow = {
@@ -209,6 +213,7 @@ export class D1BlogData implements BlogData {
       Status: post.status,
       Tags: JSON.stringify(post.tags),
       Path: post.path,
+      Description: post.description,
     }));
 
     await this.#db
@@ -237,6 +242,7 @@ function mapBlogPostRowToBlogPost(selection: BlogPostRow) {
     content: selection.Content,
     status: frontMatterStatusSchema.parse(selection.Status),
     tags: frontMatterTagsSchema.parse(JSON.parse(selection.Tags)),
+    description: selection.Description,
   };
 }
 
