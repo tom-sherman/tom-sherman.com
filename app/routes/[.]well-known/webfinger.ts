@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/cloudflare";
 
-const usernameAliases = ["me", "tom", "tomsherman"];
+const usernameAliases = ["me", "tom", "tomsherman", "mastodon", "social"];
 const resources = usernameAliases.map(
   (username) => `acct:${username}@tom-sherman.com`
 );
