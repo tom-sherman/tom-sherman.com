@@ -9,17 +9,17 @@ import {
 } from "@remix-run/react";
 import picoCss from "@picocss/pico/css/pico.min.css";
 import stylesCss from "./styles.css";
-import { MASTODON_URL } from "./constants";
+import { HOST, MASTODON_URL } from "./constants";
 import { StrictMode } from "react";
 
-export const meta: MetaFunction = () => ({
+export const meta: MetaFunction = ({ location }) => ({
   charset: "utf-8",
   title: "Tom Sherman",
   viewport: "width=device-width, initial-scale=1",
   "og:site_name": "Tom Sherman | Software Engineer",
   "og:title": "Tom Sherman | Software Engineer",
   "og:description": "Tom Sherman is a Senior Software Engineer @ OVO",
-  "og:image": "/me.jpg",
+  "og:image": `${HOST}/me.jpg`,
   "msapplication-TileColor": "#9b4dca",
   "theme-color": "#9b4dca",
   "twitter:domain": "tomsherman.com",
@@ -27,7 +27,7 @@ export const meta: MetaFunction = () => ({
   "twitter:site": "@tomus_sherman",
   "twitter:title": "Tom Sherman",
   "twitter:description": "Twiddling bits, suspending views, managing state.",
-  "twitter:image": "/me.jpg",
+  "twitter:image": `${HOST}/me.jpg`,
 });
 
 export const links: LinksFunction = () => [
