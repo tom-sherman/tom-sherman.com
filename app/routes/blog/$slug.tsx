@@ -41,6 +41,7 @@ export async function loader({ params, context }: LoaderArgs) {
       tags: post.tags,
       createdAt: post.createdAt,
       readingTimeText: readingTime(post.content).text,
+      description: post.description,
     },
   });
 }
@@ -53,7 +54,8 @@ export const meta: MetaFunction = ({
   return {
     title: data.post.title,
     "og:title": data.post.title,
-    "og:description": null,
+    "og:description": data.post.description,
+    "twitter:description": data.post.description,
     "og:type": "article",
     author: "Tom Sherman",
     "twitter:card": "summary",
