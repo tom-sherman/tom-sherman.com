@@ -1,5 +1,10 @@
 import type { LoaderArgs } from "@remix-run/cloudflare";
 
+const usernameAliases = ["me", "tom", "tomsherman"];
+const resources = usernameAliases.map(
+  (username) => `acct:${username}@tom-sherman.com`
+);
+
 export function loader({ request }: LoaderArgs) {
   const url = new URL(request.url);
   const resourceQuery = url.searchParams.get("resource");
@@ -10,7 +15,7 @@ export function loader({ request }: LoaderArgs) {
     });
   }
 
-  if (resourceQuery !== "acct:me@tom-sherman.com") {
+  if (!resources.includes(resourceQuery)) {
     return new Response("Not found", {
       status: 404,
     });
