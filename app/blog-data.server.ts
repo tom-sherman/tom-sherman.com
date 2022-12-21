@@ -17,6 +17,7 @@ const frontMatterSchema = z.object({
   tags: frontMatterTagsSchema.default([]),
   slug: z.string(),
   status: frontMatterStatusSchema.default("published"),
+  description: z.string().optional(),
 });
 
 interface PostMeta extends z.TypeOf<typeof frontMatterSchema> {
