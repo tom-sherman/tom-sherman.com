@@ -62,7 +62,7 @@ export const meta: MetaFunction = ({
     "twitter:description": data.post.description,
     "og:type": "article",
     author: "Tom Sherman",
-    "twitter:card": "summary",
+    "twitter:card": "summary_large_image",
     "og:image": imgUrl.toString(),
     "twitter:image": imgUrl.toString(),
   };
