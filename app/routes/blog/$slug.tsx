@@ -51,6 +51,10 @@ export const meta: MetaFunction = ({
 }: {
   data: SerializeFrom<typeof loader>;
 }) => {
+  const imgUrl = new URL(
+    "https://og-image-worker.tomsherman.workers.dev/img/og-blog"
+  );
+  imgUrl.searchParams.set("title", data.post.title);
   return {
     title: data.post.title,
     "og:title": data.post.title,
@@ -58,7 +62,9 @@ export const meta: MetaFunction = ({
     "twitter:description": data.post.description,
     "og:type": "article",
     author: "Tom Sherman",
-    "twitter:card": "summary",
+    "twitter:card": "summary_large_image",
+    "og:image": imgUrl.toString(),
+    "twitter:image": imgUrl.toString(),
   };
 };
 
