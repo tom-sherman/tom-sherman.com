@@ -8,13 +8,14 @@ import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { D1BlogData, createD1Kysely } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
+import type { Highlighter } from "shiki";
 import { getHighlighter, setCDN } from "shiki";
-import { useEffect, useRef } from "react";
-import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
+import { useEffect, useState } from "react";
 import readingTime from "reading-time";
 import { parse as parseMarkdown } from "~/markdown.server";
 import type { ComponentsConfig } from "~/lib/markdown-renderer";
 import { MarkdownRenderer } from "~/lib/markdown-renderer";
+import DataLoader from "dataloader";
 
 const SHIKI_VERSION = "0.11.1";
 
@@ -78,28 +79,6 @@ export const links: LinksFunction = () => [
 
 export default function BlogPost() {
   const { post } = useLoaderData<typeof loader>();
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useIsomorphicLayoutEffect(() => {
-    highlightBlocks(
-      contentRef.current!,
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    );
-  }, []);
-
-  useEffect(() => {
-    function changeListener(event: MediaQueryListEvent) {
-      highlightBlocks(contentRef.current!, event.matches);
-    }
-
-    const query = window.matchMedia("(prefers-color-scheme: dark)");
-
-    query.addEventListener("change", changeListener);
-
-    return () => {
-      query.removeEventListener("change", changeListener);
-    };
-  }, []);
 
   return (
     <>
@@ -109,12 +88,10 @@ export default function BlogPost() {
         }).format(new Date(post.createdAt))}{" "}
         - {post.readingTimeText}
       </small>
-      <div ref={contentRef}>
-        <MarkdownRenderer
-          document={post.document}
-          components={componentsConfig}
-        />
-      </div>
+      <MarkdownRenderer
+        document={post.document}
+        components={componentsConfig}
+      />
       <hr />
       <ul className="chip-list blog-tags">
         {post.tags.map((tag) => (
@@ -127,38 +104,93 @@ export default function BlogPost() {
   );
 }
 
-function highlightBlocks(container: HTMLElement, prefersDarkMode: boolean) {
-  const codeBlocks = container.querySelectorAll("pre code");
-
-  const codeBlocksArray = Array.from(codeBlocks);
-
-  const languages = new Set(
-    codeBlocksArray
-      .map((block) => {
-        const lang = block.className.split("-")[1];
-        return lang;
-      })
-      .filter((lang): lang is string => !!lang)
-  );
-
+async function highlight(code: string, lang: string, theme: string) {
   setCDN(`https://unpkg.com/shiki@${SHIKI_VERSION}/`);
-  getHighlighter({
-    theme: prefersDarkMode ? "github-dark" : "github-light",
-    langs: Array.from(languages) as any,
-  }).then((highlighter) => {
-    codeBlocksArray.forEach((code) => {
-      const lang = code.className.split("-")[1];
-      const container = document.createElement("div");
-      container.innerHTML = highlighter.codeToHtml(code.textContent || "", {
-        lang,
-      });
 
-      const newCode = container.querySelector("code")!;
-      newCode.className = code.className;
+  const highlighter = await highlighterLoader.load({ lang, theme });
 
-      code.replaceWith(newCode);
+  const html = highlighter.codeToHtml(code, { lang });
+
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  return container.querySelector("code")!.innerHTML;
+}
+
+const highlighterKeys = new Map<string, { lang: string; theme: string }>();
+const highlighterLoader = new DataLoader<
+  { lang: string; theme: string },
+  Highlighter
+>(
+  async (keys) => {
+    const highlighter = await getHighlighter({
+      themes: keys.map((key) => key.theme),
+      langs: keys.map((key) => key.lang) as any,
     });
-  });
+
+    // We want to return a single highlighter, but data loader requires us to return a highlighter for each key.
+    return keys.map(() => highlighter);
+  },
+  {
+    cacheKeyFn(key) {
+      const cacheKey = highlighterKeys.get(`${key.lang}-${key.theme}`);
+      if (cacheKey) {
+        return cacheKey;
+      }
+
+      highlighterKeys.set(`${key.lang}-${key.theme}`, key);
+      return key;
+    },
+  }
+);
+
+function HighlightedCodeBlock({ code, lang }: { code: string; lang: string }) {
+  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    setHighlightedHtml(null);
+
+    highlight(
+      code,
+      lang,
+      getTheme(window.matchMedia("(prefers-color-scheme: dark)"))
+    ).then((html) => {
+      if (!controller.signal.aborted) {
+        setHighlightedHtml(html);
+      }
+    });
+
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener(
+      "change",
+      async (event) => {
+        const html = await highlight(code, lang, getTheme(event));
+
+        if (!controller.signal.aborted) {
+          setHighlightedHtml(html);
+        }
+      },
+      {
+        signal: controller.signal,
+      }
+    );
+
+    return () => controller.abort();
+  }, [code, lang]);
+
+  return (
+    <pre>
+      {highlightedHtml ? (
+        <code dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
+      ) : (
+        <code>{code}</code>
+      )}
+    </pre>
+  );
+}
+
+function getTheme({ matches }: { matches: boolean }) {
+  return matches ? "github-dark" : "github-light";
 }
 
 const componentsConfig: ComponentsConfig = {
@@ -186,13 +218,14 @@ const componentsConfig: ComponentsConfig = {
   list: ({ children }) => <ul>{children}</ul>,
   table: ({ children }) => <table>{children}</table>,
   listItem: ({ children }) => <li>{children}</li>,
-  code: ({ node }) => (
-    <pre>
-      <code className={node.lang ? `language-${node.lang}` : undefined}>
-        {node.value}
-      </code>
-    </pre>
-  ),
+  code: ({ node }) =>
+    node.lang ? (
+      <HighlightedCodeBlock code={node.value} lang={node.lang} />
+    ) : (
+      <pre>
+        <code>{node.value}</code>
+      </pre>
+    ),
   tableRow: ({ children }) => <tr>{children}</tr>,
   tableCell: ({ children }) => <td>{children}</td>,
   text: ({ node }) => <>{node.value}</>,
