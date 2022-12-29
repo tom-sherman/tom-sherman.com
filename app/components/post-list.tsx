@@ -1,5 +1,4 @@
 import { Link } from "@remix-run/react";
-import { marked } from "marked";
 
 interface Post {
   slug: string;
@@ -46,7 +45,7 @@ export function PostTitle({
   return (
     <Element
       dangerouslySetInnerHTML={{
-        __html: marked.parseInline(title),
+        __html: title,
       }}
     />
   );

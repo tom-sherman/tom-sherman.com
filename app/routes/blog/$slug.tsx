@@ -6,16 +6,15 @@ import type {
 } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
-import {
-  D1BlogData,
-  createD1Kysely,
-  renderPostToHtml,
-} from "~/blog-data.server";
+import { D1BlogData, createD1Kysely } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
 import { getHighlighter, setCDN } from "shiki";
 import { useEffect, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
 import readingTime from "reading-time";
+import { parse as parseMarkdown } from "~/markdown.server";
+import type { ComponentsConfig } from "~/lib/markdown-renderer";
+import { MarkdownRenderer } from "~/lib/markdown-renderer";
 
 const SHIKI_VERSION = "0.11.1";
 
@@ -37,7 +36,7 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({
     post: {
       title: post.title,
-      content: renderPostToHtml(post.content),
+      document: parseMarkdown(post.content),
       tags: post.tags,
       createdAt: post.createdAt,
       readingTimeText: readingTime(post.content).text,
@@ -110,12 +109,12 @@ export default function BlogPost() {
         }).format(new Date(post.createdAt))}{" "}
         - {post.readingTimeText}
       </small>
-      <div
-        ref={contentRef}
-        dangerouslySetInnerHTML={{
-          __html: post.content,
-        }}
-      />
+      <div ref={contentRef}>
+        <MarkdownRenderer
+          document={post.document}
+          components={componentsConfig}
+        />
+      </div>
       <hr />
       <ul className="chip-list blog-tags">
         {post.tags.map((tag) => (
@@ -161,3 +160,44 @@ function highlightBlocks(container: HTMLElement, prefersDarkMode: boolean) {
     });
   });
 }
+
+const componentsConfig: ComponentsConfig = {
+  paragraph: ({ children }) => <p>{children}</p>,
+  heading: ({ children, node }) => {
+    switch (node.depth) {
+      case 1:
+        return <h1>{children}</h1>;
+      case 2:
+        return <h2>{children}</h2>;
+      case 3:
+        return <h3>{children}</h3>;
+      case 4:
+        return <h4>{children}</h4>;
+      case 5:
+        return <h5>{children}</h5>;
+      case 6:
+        return <h6>{children}</h6>;
+      default:
+        return <h1>{children}</h1>;
+    }
+  },
+  thematicBreak: () => <hr />,
+  blockquote: ({ children }) => <blockquote>{children}</blockquote>,
+  list: ({ children }) => <ul>{children}</ul>,
+  table: ({ children }) => <table>{children}</table>,
+  listItem: ({ children }) => <li>{children}</li>,
+  code: ({ node }) => (
+    <pre>
+      <code className={`language-${node.lang}`}>{node.value}</code>
+    </pre>
+  ),
+  tableRow: ({ children }) => <tr>{children}</tr>,
+  tableCell: ({ children }) => <td>{children}</td>,
+  text: ({ node }) => <>{node.value}</>,
+  emphasis: ({ children }) => <em>{children}</em>,
+  strong: ({ children }) => <strong>{children}</strong>,
+  delete: ({ children }) => <del>{children}</del>,
+  inlineCode: ({ node }) => <code>{node.value}</code>,
+  image: ({ node }) => <img src={node.url} alt={node.alt ?? undefined} />,
+  link: ({ node, children }) => <a href={node.url}>{children}</a>,
+};

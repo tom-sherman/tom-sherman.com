@@ -279,7 +279,3 @@ function parseFrontMatter(input: string) {
     attributes: frontMatterSchema.parse(frontMatter),
   };
 }
-
-export function renderPostToHtml(content: string) {
-  return marked(content);
-}
