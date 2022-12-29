@@ -2,8 +2,10 @@ import type { request as githubRequest } from "@octokit/request";
 import type { SelectType } from "kysely";
 import { Kysely } from "kysely";
 import { D1Dialect } from "kysely-d1";
-import { marked } from "marked";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { z } from "zod";
+import { BlogRenderer } from "./blog-renderer-server";
 
 const frontMatterTagsSchema = z.array(z.string());
 const frontMatterStatusSchema = z.union([
@@ -281,5 +283,5 @@ function parseFrontMatter(input: string) {
 }
 
 export function renderPostToHtml(content: string) {
-  return marked(content);
+  return renderToStaticMarkup(createElement(BlogRenderer, { input: content }));
 }

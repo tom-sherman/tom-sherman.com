@@ -20,7 +20,7 @@
     "isbot": "^3.6.5",
     "kysely": "^0.22.0",
     "kysely-d1": "^0.0.5",
-    "marked": "^4.2.2",
+    "mdast-util-from-markdown": "^1.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reading-time": "^1.5.0",
