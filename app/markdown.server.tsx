@@ -1,9 +1,21 @@
 import type { PropsWithChildren, ReactElement } from "react";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import type * as ast from "mdast";
+import { visit } from "unist-util-visit";
+import { gfmFromMarkdown } from "mdast-util-gfm";
+import { gfm } from "micromark-extension-gfm";
 
 export function parse(input: string) {
-  return fromMarkdown(input);
+  const tree = fromMarkdown(input, {
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
+  });
+
+  visit(tree, "paragraph", (node) => {
+    console.log(node);
+  });
+
+  return tree;
 }
 
 interface NodeRenderer<TNode> {
