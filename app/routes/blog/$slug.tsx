@@ -188,7 +188,9 @@ const componentsConfig: ComponentsConfig = {
   listItem: ({ children }) => <li>{children}</li>,
   code: ({ node }) => (
     <pre>
-      <code className={`language-${node.lang}`}>{node.value}</code>
+      <code className={node.lang ? `language-${node.lang}` : undefined}>
+        {node.value}
+      </code>
     </pre>
   ),
   tableRow: ({ children }) => <tr>{children}</tr>,
