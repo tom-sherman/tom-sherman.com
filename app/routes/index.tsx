@@ -35,7 +35,7 @@ export default function Index() {
       <main className="container">
         <h2>Recent blog posts</h2>
 
-        <Suspense fallback={<article aria-busy />}>
+        <Suspense fallback={<BlogPostsSkeleton />}>
           <Await
             resolve={recentBlogPosts}
             errorElement={<p>Oops! Failed to load blog posts</p>}
@@ -116,11 +116,30 @@ export default function Index() {
   );
 }
 
+function BlogPostsSkeleton() {
+  return (
+    <>
+      <div aria-busy className="grid" />
+      <div
+        className="grid skeleton"
+        style={{ cursor: "progress", userSelect: "none" }}
+      >
+        {Array.from({ length: 3 }).map((_, i) => (
+          <article key={i}>
+            <header>███████████</header>
+            <h4>████████████████</h4>
+          </article>
+        ))}
+      </div>
+    </>
+  );
+}
+
 function Me() {
   return (
     <section className="about-me">
       <img
-        style={{ borderRadius: "50%", width: "10rem" }}
+        style={{ borderRadius: "50%", width: "10rem", height: "10rem" }}
         src="/me.jpg"
         alt="Tom Sherman"
       />
