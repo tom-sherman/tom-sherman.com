@@ -128,17 +128,17 @@ function Me() {
       <ul>
         <li>
           <a rel="me" href={MASTODON_URL} title="Mastodon">
-            <img src="/mastodon.svg" />
+            <img src="/mastodon.svg" alt="" />
           </a>
         </li>
         <li>
           <a href="https://twitter.com/tomus_sherman" rel="me" title="Twitter">
-            <img src="/twitter.svg" />
+            <img src="/twitter.svg" alt="" />
           </a>
         </li>
         <li>
           <a href="https://github.com/tom-sherman" rel="me" title="GitHub">
-            <img src="/github.svg" />
+            <img src="/github.svg" alt="" />
           </a>
         </li>
         <li>
@@ -147,7 +147,7 @@ function Me() {
             title="LinkedIn"
             rel="me"
           >
-            <img src="/linkedin.svg" />
+            <img src="/linkedin.svg" alt="" />
           </a>
         </li>
       </ul>
