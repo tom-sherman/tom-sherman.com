@@ -147,24 +147,24 @@ function Me() {
     <section className="about-me">
       <img
         style={{ borderRadius: "50%", width: "10rem", height: "10rem" }}
-        src="/me.jpg"
+        src="/img/me.jpg"
         alt="Tom Sherman"
       />
       <h1>Tom Sherman</h1>
       <ul>
         <li>
           <a rel="me" href={MASTODON_URL} title="Mastodon">
-            <img src="/mastodon.svg" alt="" />
+            <img src="/img/mastodon.svg" alt="" />
           </a>
         </li>
         <li>
           <a href="https://twitter.com/tomus_sherman" rel="me" title="Twitter">
-            <img src="/twitter.svg" alt="" />
+            <img src="/img/twitter.svg" alt="" />
           </a>
         </li>
         <li>
           <a href="https://github.com/tom-sherman" rel="me" title="GitHub">
-            <img src="/github.svg" alt="" />
+            <img src="/img/github.svg" alt="" />
           </a>
         </li>
         <li>
@@ -173,7 +173,7 @@ function Me() {
             title="LinkedIn"
             rel="me"
           >
-            <img src="/linkedin.svg" alt="" />
+            <img src="/img/linkedin.svg" alt="" />
           </a>
         </li>
       </ul>

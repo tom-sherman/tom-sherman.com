@@ -1,8 +1,4 @@
-import type {
-  HeadersFunction,
-  LinksFunction,
-  MetaFunction,
-} from "@remix-run/cloudflare";
+import type { LinksFunction, MetaFunction } from "@remix-run/cloudflare";
 import {
   Links,
   LiveReload,
@@ -52,13 +48,13 @@ export const links: LinksFunction = () => [
     rel: "icon",
     type: "image/png",
     sizes: "32x32",
-    href: "/favicon-32x32.png",
+    href: "/img/favicon-32x32.png",
   },
   {
     rel: "icon",
     type: "image/png",
     sizes: "16x16",
-    href: "/favicon-16x16.png",
+    href: "/img/favicon-16x16.png",
   },
   {
     rel: "me",
