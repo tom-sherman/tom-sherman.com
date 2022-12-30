@@ -119,7 +119,14 @@ export default function Index() {
 function BlogPostsSkeleton() {
   return (
     <>
-      <div aria-busy className="grid" />
+      <div
+        aria-busy
+        className="grid"
+        style={{
+          // This magic number is a bit of a hack, it's the height of the "view all blog posts" link
+          height: 28,
+        }}
+      />
       <div
         className="grid skeleton"
         style={{ cursor: "progress", userSelect: "none" }}
