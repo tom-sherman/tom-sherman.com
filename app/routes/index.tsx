@@ -129,7 +129,7 @@ function BlogPostsSkeleton() {
       />
       <div
         className="grid skeleton"
-        style={{ cursor: "progress", userSelect: "none" }}
+        style={{ cursor: "progress", userSelect: "none", opacity: 0.4 }}
       >
         {Array.from({ length: 3 }).map((_, i) => (
           <article key={i}>
