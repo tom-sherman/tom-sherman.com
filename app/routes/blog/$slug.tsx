@@ -4,18 +4,21 @@ import type {
   MetaFunction,
   SerializeFrom,
 } from "@remix-run/cloudflare";
+import { redirect } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import {
   D1BlogData,
   createD1Kysely,
   renderPostToHtml,
+  GitHubBlogData,
 } from "~/blog-data.server";
 import { Chip } from "~/components/chip";
 import { getHighlighter, setCDN } from "shiki";
 import { useEffect, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
 import readingTime from "reading-time";
+import { request as githubRequest } from "@octokit/request";
 
 const SHIKI_VERSION = "0.11.1";
 
@@ -31,6 +34,24 @@ export async function loader({ params, context }: LoaderArgs) {
   const post = await blog.getPost(slug);
 
   if (!post) {
+    const github = new GitHubBlogData(
+      githubRequest.defaults({
+        headers: {
+          authorization: `token ${(context as any).env.GITHUB_TOKEN}`,
+          accept: "application/vnd.github.v3+json",
+        },
+      })
+    );
+
+    try {
+      const post = await github.getPostByPath(`posts/${slug}`);
+      return redirect(`/blog/${post.slug}`, { status: 301 });
+    } catch (e) {
+      if ((e as any)?.status !== 404) {
+        throw e;
+      }
+      console.log(e);
+    }
     throw new Response("Not found", { status: 404 });
   }
 
