@@ -34,6 +34,7 @@ export default function Index() {
       <Me />
       <main className="container">
         <h2>Recent blog posts</h2>
+        <Link to="/blog">View all blog posts</Link>
 
         <Suspense fallback={<BlogPostsSkeleton />}>
           <Await
@@ -41,19 +42,16 @@ export default function Index() {
             errorElement={<p>Oops! Failed to load blog posts</p>}
           >
             {(posts) => (
-              <>
-                <Link to="/blog">View all blog posts</Link>
-                <div className="grid recent-posts">
-                  {posts.map((post) => (
-                    <article key={post.url}>
-                      <header>{post.createdAt}</header>
-                      <Link to={post.url}>
-                        <PostTitle as="h4" title={post.title} />
-                      </Link>
-                    </article>
-                  ))}
-                </div>
-              </>
+              <div className="grid recent-posts">
+                {posts.map((post) => (
+                  <article key={post.url}>
+                    <header>{post.createdAt}</header>
+                    <Link to={post.url}>
+                      <PostTitle as="h4" title={post.title} />
+                    </Link>
+                  </article>
+                ))}
+              </div>
             )}
           </Await>
         </Suspense>
@@ -118,27 +116,17 @@ export default function Index() {
 
 function BlogPostsSkeleton() {
   return (
-    <>
-      <div
-        aria-busy
-        className="grid"
-        style={{
-          // This magic number is a bit of a hack, it's the height of the "view all blog posts" link
-          height: 28,
-        }}
-      />
-      <div
-        className="grid skeleton"
-        style={{ cursor: "progress", userSelect: "none", opacity: 0.4 }}
-      >
-        {Array.from({ length: 3 }).map((_, i) => (
-          <article key={i}>
-            <header>███████████</header>
-            <h4>████████████████</h4>
-          </article>
-        ))}
-      </div>
-    </>
+    <div
+      className="grid skeleton"
+      style={{ cursor: "progress", userSelect: "none", opacity: 0.4 }}
+    >
+      {Array.from({ length: 3 }).map((_, i) => (
+        <article key={i}>
+          <header>███████████</header>
+          <h4>████████████████</h4>
+        </article>
+      ))}
+    </div>
   );
 }
 
