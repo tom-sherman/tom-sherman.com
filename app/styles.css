@@ -2,6 +2,10 @@
   cursor: unset;
 }
 
+body {
+  border-top: 5px solid #9b4dca;
+}
+
 .about-me {
   display: flex;
   flex-direction: column;
