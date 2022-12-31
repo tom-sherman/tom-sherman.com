@@ -18,6 +18,7 @@ export const meta: MetaFunction = ({ location }) => ({
   viewport: "width=device-width, initial-scale=1",
   "og:site_name": "Tom Sherman | Software Engineer",
   "og:title": "Tom Sherman | Software Engineer",
+  description: "Tom Sherman is a Senior Software Engineer @ OVO",
   "og:description": "Tom Sherman is a Senior Software Engineer @ OVO",
   "og:image": `${HOST}/me.jpg`,
   "msapplication-TileColor": "#9b4dca",
