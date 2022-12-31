@@ -127,9 +127,6 @@ export default function BlogPost() {
 
   return (
     <>
-      <a href="/blog">
-        <h1 className="text-3xl font-bold">Blog</h1>
-      </a>
       <small>
         {new Intl.DateTimeFormat("en-GB", {
           dateStyle: "long",
