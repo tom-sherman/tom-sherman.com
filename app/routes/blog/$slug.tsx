@@ -19,6 +19,7 @@ import { useEffect, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
 import readingTime from "reading-time";
 import { request as githubRequest } from "@octokit/request";
+import { useClientNavigationLinks } from "~/lib/use-client-navigation-links";
 
 const SHIKI_VERSION = "0.11.1";
 
@@ -99,6 +100,7 @@ export const links: LinksFunction = () => [
 ];
 
 export default function BlogPost() {
+  useClientNavigationLinks();
   const { post } = useLoaderData<typeof loader>();
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +127,9 @@ export default function BlogPost() {
 
   return (
     <>
+      <a href="/blog">
+        <h1 className="text-3xl font-bold">Blog</h1>
+      </a>
       <small>
         {new Intl.DateTimeFormat("en-GB", {
           dateStyle: "long",
