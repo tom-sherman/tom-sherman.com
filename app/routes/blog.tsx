@@ -1,5 +1,6 @@
 import type { MetaFunction } from "@remix-run/cloudflare";
 import { Link, Outlet } from "@remix-run/react";
+import { Me } from "~/components/about-me";
 import { Copyright } from "~/components/copyright";
 
 export const meta: MetaFunction = () => ({
@@ -31,6 +32,11 @@ export default function Blog() {
       <main className="container">
         <Outlet />
       </main>
+      <section className="container">
+        <article>
+          <Me />
+        </article>
+      </section>
       <footer className="container">
         <p>
           <Copyright />

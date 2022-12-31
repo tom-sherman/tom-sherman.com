@@ -4,9 +4,9 @@ import { Link, useLoaderData, Await } from "@remix-run/react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { createD1Kysely, D1BlogData } from "~/blog-data.server";
+import { Me } from "~/components/about-me";
 import { Copyright } from "~/components/copyright";
 import { PostTitle } from "~/components/post-list";
-import { MASTODON_URL } from "~/constants";
 
 export async function loader({ context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -31,7 +31,9 @@ export default function Index() {
 
   return (
     <>
-      <Me />
+      <section className="container">
+        <Me />
+      </section>
       <main className="container">
         <h2>Recent blog posts</h2>
         <Link to="/blog">View all blog posts</Link>
@@ -127,45 +129,6 @@ function BlogPostsSkeleton() {
         </article>
       ))}
     </div>
-  );
-}
-
-function Me() {
-  return (
-    <section className="about-me">
-      <img
-        style={{ borderRadius: "50%", width: "10rem", height: "10rem" }}
-        src="/img/me.jpg"
-        alt="Tom Sherman"
-      />
-      <h1>Tom Sherman</h1>
-      <ul>
-        <li>
-          <a rel="me" href={MASTODON_URL} title="Mastodon">
-            <img src="/img/mastodon.svg" alt="" />
-          </a>
-        </li>
-        <li>
-          <a href="https://twitter.com/tomus_sherman" rel="me" title="Twitter">
-            <img src="/img/twitter.svg" alt="" />
-          </a>
-        </li>
-        <li>
-          <a href="https://github.com/tom-sherman" rel="me" title="GitHub">
-            <img src="/img/github.svg" alt="" />
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://www.linkedin.com/in/tom-sherman-2a2aa0136/"
-            title="LinkedIn"
-            rel="me"
-          >
-            <img src="/img/linkedin.svg" alt="" />
-          </a>
-        </li>
-      </ul>
-    </section>
   );
 }
 
