@@ -57,7 +57,8 @@ li.chip {
   gap: 0.5em;
 }
 
-.recent-posts a h4 {
+.recent-posts a h3 {
   color: var(--primary);
   margin-bottom: 0;
+  font-size: 1.25rem;
 }

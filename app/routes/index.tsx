@@ -49,7 +49,7 @@ export default function Index() {
                   <article key={post.url}>
                     <header>{post.createdAt}</header>
                     <Link to={post.url}>
-                      <PostTitle as="h4" title={post.title} />
+                      <PostTitle as="h3" title={post.title} />
                     </Link>
                   </article>
                 ))}
