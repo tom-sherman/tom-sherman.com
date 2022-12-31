@@ -98,3 +98,8 @@ li.chip {
   margin: 0;
   gap: 0.5em;
 }
+
+.recent-posts a h4 {
+  color: var(--primary);
+  margin-bottom: 0;
+}

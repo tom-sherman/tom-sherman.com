@@ -43,7 +43,7 @@ export default function Index() {
             {(posts) => (
               <>
                 <Link to="/blog">View all blog posts</Link>
-                <div className="grid">
+                <div className="grid recent-posts">
                   {posts.map((post) => (
                     <article key={post.url}>
                       <header>{post.createdAt}</header>
