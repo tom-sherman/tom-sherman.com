@@ -44,7 +44,7 @@ export async function loader({ params, context }: LoaderArgs) {
     );
 
     try {
-      const post = await github.getPostByPath(`posts/${slug}.md`);
+      const post = await github.getPostByPath(`posts/${slug}`);
       return redirect(`/blog/${post.slug}`, { status: 301 });
     } catch (e) {
       if ((e as any)?.status !== 404) {
