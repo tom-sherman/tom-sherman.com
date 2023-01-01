@@ -22,7 +22,8 @@ export function useClientNavigationLinks() {
           // Ignore right clicks
           event.button === 0 &&
           // Ignore if `target="_blank"`
-          [null, undefined, "", "self"].includes(target.target)
+          [null, undefined, "", "self"].includes(target.target) &&
+          !target.hasAttribute("download")
         ) {
           console.log(
             "Treating anchor as <Link> and navigating to:",
