@@ -9,16 +9,8 @@ export function useClientNavigationLinks() {
     document.addEventListener(
       "click",
       (event) => {
-        let target = event.target;
-        // Find the first parent anchor element
-        while (target && target !== document) {
-          if (target instanceof HTMLAnchorElement) {
-            break;
-          }
-          target = (target as any)?.parentNode;
-        }
-
-        if (!(target instanceof HTMLAnchorElement)) return;
+        const target = (event.target as Partial<HTMLElement>).closest?.("a");
+        if (!target) return;
 
         const url = new URL(target.href, location.origin);
         if (
