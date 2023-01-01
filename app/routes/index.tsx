@@ -31,7 +31,7 @@ export default function Index() {
 
   return (
     <>
-      <section className="container">
+      <section className="container home-hero">
         <Me />
       </section>
       <main className="container">

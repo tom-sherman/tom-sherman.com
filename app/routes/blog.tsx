@@ -10,7 +10,7 @@ export const meta: MetaFunction = () => ({
 export default function Blog() {
   return (
     <>
-      <nav className="container">
+      <nav className="container blog-nav">
         <ul>
           <li>
             <strong>Tom's blog</strong>
@@ -29,7 +29,7 @@ export default function Blog() {
           </li>
         </ul>
       </nav>
-      <main className="container">
+      <main className="post-content">
         <Outlet />
       </main>
       <section className="container">
