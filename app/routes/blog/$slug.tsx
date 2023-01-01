@@ -111,7 +111,7 @@ export default function BlogPost() {
       contentRef.current!,
       window.matchMedia("(prefers-color-scheme: dark)").matches
     );
-  }, []);
+  }, [post.content]);
 
   useEffect(() => {
     function changeListener(event: MediaQueryListEvent) {
@@ -125,7 +125,7 @@ export default function BlogPost() {
     return () => {
       query.removeEventListener("change", changeListener);
     };
-  }, []);
+  }, [post.content]);
 
   return (
     <>
