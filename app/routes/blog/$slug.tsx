@@ -45,8 +45,8 @@ export async function loader({ params, context }: LoaderArgs) {
     );
 
     try {
-      const post = await github.getPostByPath(`posts/${slug}`);
-      return redirect(`/blog/${post.slug}`, { status: 301 });
+      const resolvedSlug = await github.getPostSlugByPath(`posts/${slug}`);
+      return redirect(`/blog/${resolvedSlug}`, { status: 301 });
     } catch (e) {
       if ((e as any)?.status !== 404) {
         throw e;
@@ -64,6 +64,7 @@ export async function loader({ params, context }: LoaderArgs) {
       createdAt: post.createdAt,
       readingTimeText: readingTime(post.content).text,
       description: post.description,
+      lastModifiedAt: post.lastModifiedAt,
     },
   });
 }
@@ -141,6 +142,18 @@ export default function BlogPost() {
         }}
       />
       <hr />
+      {post.lastModifiedAt ? (
+        <p>
+          <small>
+            <em>
+              This article was last updated on{" "}
+              {new Intl.DateTimeFormat("en-GB", {
+                dateStyle: "long",
+              }).format(new Date(post.lastModifiedAt))}
+            </em>
+          </small>
+        </p>
+      ) : null}
       <ul className="chip-list blog-tags">
         {post.tags.map((tag) => (
           <Link to={`/blog/tags/${tag}`} key={tag}>

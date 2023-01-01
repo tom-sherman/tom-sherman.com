@@ -29,6 +29,7 @@ interface PostMeta extends z.TypeOf<typeof frontMatterSchema> {
 
 interface BlogPost extends PostMeta {
   content: string;
+  lastModifiedAt: string | null;
 }
 
 export interface BlogData {
@@ -69,13 +70,37 @@ export class GitHubBlogData implements BlogData {
       );
   }
 
-  async getPostByPath(path: string) {
+  async #getPostDataByPath(path: string) {
     const content = await this.#getRawFileContents(path);
     const fontMatter = parseFrontMatter(content);
+
     return {
-      path,
       content: content.slice(fontMatter.contentStart),
       ...fontMatter.attributes,
+    };
+  }
+
+  async getPostSlugByPath(path: string) {
+    const postData = await this.#getPostDataByPath(path);
+    return postData.slug;
+  }
+
+  async getPostByPath(path: string) {
+    const postData = await this.#getPostDataByPath(path);
+
+    const commits = await this.#gh(`GET /repos/{owner}/{repo}/commits`, {
+      owner: "tom-sherman",
+      repo: "blog",
+      path,
+    });
+
+    return {
+      path,
+      ...postData,
+      lastModifiedAt:
+        commits.data.length < 2
+          ? null
+          : commits.data[0]?.commit.committer?.date ?? null,
     };
   }
 
@@ -214,6 +239,7 @@ export class D1BlogData implements BlogData {
       Tags: JSON.stringify(post.tags),
       Path: post.path,
       Description: post.description,
+      LastModifiedAt: post.lastModifiedAt,
     }));
 
     await this.#db
@@ -243,6 +269,7 @@ function mapBlogPostRowToBlogPost(selection: BlogPostRow) {
     status: frontMatterStatusSchema.parse(selection.Status),
     tags: frontMatterTagsSchema.parse(JSON.parse(selection.Tags)),
     description: selection.Description,
+    lastModifiedAt: selection.LastModifiedAt,
   };
 }
 
