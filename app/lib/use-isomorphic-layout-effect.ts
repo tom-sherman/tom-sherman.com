@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 
 const isClient = typeof window === "object";
-export const useIsomorphicLayoutEffect = isClient ? useLayoutEffect : useEffect;
+export const useIsomorphicLayoutEffect = isClient ? useLayoutEffect : () => {};
