@@ -257,6 +257,24 @@ export class D1BlogData implements BlogData {
   async deletePostsByPath(...paths: string[]) {
     await this.#db.deleteFrom("BlogPosts").where("Path", "in", paths).execute();
   }
+
+  async listAllTags() {
+    const rows = await this.#db
+      .selectFrom("BlogPosts")
+      .select("Tags")
+      .execute();
+
+    const tags = new Set<string>();
+
+    for (const row of rows) {
+      const parsedTags = z.array(z.string()).parse(JSON.parse(row.Tags));
+      for (const tag of parsedTags) {
+        tags.add(tag);
+      }
+    }
+
+    return [...tags].sort();
+  }
 }
 
 function mapBlogPostRowToBlogPost(selection: BlogPostRow) {

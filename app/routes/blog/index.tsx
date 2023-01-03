@@ -1,14 +1,21 @@
 import type { LoaderArgs, MetaFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { D1BlogData, createD1Kysely } from "~/lib/blog-data.server";
 import { PostList } from "~/components/post-list";
+import { Chip } from "~/components/chip";
 
 export async function loader({ context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
 
+  const [posts, tags] = await Promise.all([
+    blog.listAllPosts(),
+    blog.listAllTags(),
+  ]);
+
   return json({
-    posts: await blog.listAllPosts(),
+    posts,
+    tags,
   });
 }
 
@@ -17,7 +24,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function BlogIndex() {
-  const { posts } = useLoaderData<typeof loader>();
+  const { posts, tags } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -37,6 +44,15 @@ export default function BlogIndex() {
           createdAt: new Date(post.createdAt),
         }))}
       />
+
+      <h2>Tags</h2>
+      <ul className="chip-list">
+        {tags.map((tag) => (
+          <Link to={`/blog/tags/${tag}`} key={tag}>
+            <Chip as="li">{tag}</Chip>
+          </Link>
+        ))}
+      </ul>
     </>
   );
 }

@@ -154,7 +154,7 @@ export default function BlogPost() {
           </small>
         </p>
       ) : null}
-      <ul className="chip-list blog-tags">
+      <ul className="chip-list">
         {post.tags.map((tag) => (
           <Link to={`/blog/tags/${tag}`} key={tag}>
             <Chip as="li">{tag}</Chip>
