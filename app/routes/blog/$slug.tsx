@@ -21,7 +21,7 @@ import readingTime from "reading-time";
 import { request as githubRequest } from "@octokit/request";
 import { useClientNavigationLinks } from "~/lib/use-client-navigation-links";
 
-const SHIKI_VERSION = "0.11.1";
+const SHIKI_PATH = "/assets/shiki";
 
 export async function loader({ params, context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
@@ -95,7 +95,7 @@ export const meta: MetaFunction = ({
 export const links: LinksFunction = () => [
   {
     rel: "preload",
-    href: `https://unpkg.com/shiki@${SHIKI_VERSION}/dist/onig.wasm`,
+    href: `${SHIKI_PATH}/dist/onig.wasm`,
     as: "fetch",
     crossOrigin: "anonymous",
   },
@@ -179,7 +179,7 @@ function highlightBlocks(container: HTMLElement, prefersDarkMode: boolean) {
       .filter((lang): lang is string => !!lang)
   );
 
-  setCDN(`https://unpkg.com/shiki@${SHIKI_VERSION}/`);
+  setCDN(`${SHIKI_PATH}/`);
   getHighlighter({
     theme: prefersDarkMode ? "github-dark" : "github-light",
     langs: Array.from(languages) as any,
