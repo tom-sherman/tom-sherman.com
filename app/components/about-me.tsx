@@ -5,7 +5,7 @@ export function Me() {
     <div className="about-me">
       <img
         style={{ borderRadius: "50%", width: "10rem", height: "10rem" }}
-        src="/img/me.jpg"
+        src="/assets/img/me.jpg"
         alt="Tom Sherman"
       />
       <div>

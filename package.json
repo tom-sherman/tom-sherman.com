@@ -2,11 +2,10 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
+    "build": "remix build && mkdir -p public/build/shiki/dist && cp -r node_modules/shiki/languages node_modules/shiki/themes public/build/shiki && cp node_modules/shiki/dist/onig.wasm public/build/shiki/dist/onig.wasm",
     "dev:remix": "remix watch",
     "dev:wrangler": "cross-env NODE_ENV=development wrangler pages dev --local --persist ./public",
-    "dev": "remix build && run-p \"dev:*\"",
-    "start": "cross-env NODE_ENV=production npm run dev:wrangler",
+    "dev": "npm run build && run-p \"dev:*\"",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -24,7 +23,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reading-time": "^1.5.0",
-    "shiki": "^0.11.1",
+    "shiki": "0.11.1",
     "zod": "^3.19.1"
   },
   "devDependencies": {
