@@ -36,7 +36,12 @@ export default function BlogTag() {
       <h1>
         Posts tagged with <Chip>{tag}</Chip>
       </h1>
-      <PostList posts={posts} />
+      <PostList
+        posts={posts.map((post) => ({
+          ...post,
+          createdAt: new Date(post.createdAt),
+        }))}
+      />
     </>
   );
 }
