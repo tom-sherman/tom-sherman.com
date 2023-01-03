@@ -12,7 +12,7 @@ import {
   createD1Kysely,
   renderPostToHtml,
   GitHubBlogData,
-} from "~/blog-data.server";
+} from "~/lib/blog-data.server";
 import { Chip } from "~/components/chip";
 import { getHighlighter, setCDN } from "shiki";
 import { useEffect, useRef } from "react";

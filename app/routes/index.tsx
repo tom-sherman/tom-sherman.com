@@ -3,7 +3,7 @@ import { defer } from "@remix-run/cloudflare";
 import { Link, useLoaderData, Await } from "@remix-run/react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-import { createD1Kysely, D1BlogData } from "~/blog-data.server";
+import { createD1Kysely, D1BlogData } from "~/lib/blog-data.server";
 import { Me } from "~/components/about-me";
 import { Copyright } from "~/components/copyright";
 import { PostTitle } from "~/components/post-list";

@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { verify } from "@octokit/webhooks-methods";
-import { createD1Kysely, D1BlogData, GitHubBlogData } from "~/blog-data.server";
+import {
+  createD1Kysely,
+  D1BlogData,
+  GitHubBlogData,
+} from "~/lib/blog-data.server";
 import { request as githubRequest } from "@octokit/request";
 
 export const onRequest: PagesFunction<{

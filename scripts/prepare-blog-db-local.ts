@@ -1,7 +1,6 @@
 import Database from "better-sqlite3";
 import { Kysely, sql, SqliteDialect } from "kysely";
-import type { BlogPostsTable } from "~/blog-data.server";
-import { GitHubBlogData } from "~/blog-data.server";
+import { GitHubBlogData, type BlogPostsTable } from "~/lib/blog-data.server";
 import { request as githubRequest } from "@octokit/request";
 import * as dotenv from "dotenv";
 import * as path from "node:path";

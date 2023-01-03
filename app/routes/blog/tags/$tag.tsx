@@ -1,6 +1,7 @@
-import { json, LoaderArgs, SerializeFrom } from "@remix-run/cloudflare";
+import type { LoaderArgs, SerializeFrom } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { D1BlogData, createD1Kysely } from "~/blog-data.server";
+import { D1BlogData, createD1Kysely } from "~/lib/blog-data.server";
 import { Chip } from "~/components/chip";
 import { PostList } from "~/components/post-list";
 
