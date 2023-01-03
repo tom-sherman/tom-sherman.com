@@ -21,7 +21,7 @@ import readingTime from "reading-time";
 import { request as githubRequest } from "@octokit/request";
 import { useClientNavigationLinks } from "~/lib/use-client-navigation-links";
 
-const SHIKI_PATH = "/assets/shiki";
+const SHIKI_PATH = "/build/shiki";
 
 export async function loader({ params, context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
