@@ -9,25 +9,30 @@ export default async function handleRequest(
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
-  const http2PushLinksHeaders = remixContext.matches
-    .flatMap(({ route: { module, imports } }) => [module, ...(imports || [])])
+  let modules = Object.entries(remixContext.manifest.routes);
+  let http2PushLinksHeaders = remixContext.staticHandlerContext.matches
+    .flatMap((match) => {
+      let routeMatch = modules.find((m) => m[0] === match.route.id);
+      if (!routeMatch) return [];
+      let routeImports = routeMatch[1]?.imports ?? [];
+      return [routeMatch[1]?.module, ...routeImports];
+    })
     .filter(Boolean)
     .concat([
       remixContext.manifest.url,
       remixContext.manifest.entry.module,
       ...remixContext.manifest.entry.imports,
     ]);
+
   responseHeaders.set(
     "Link",
     http2PushLinksHeaders
-      .map(
-        (link: string) =>
-          `<${link}>; rel=preload; as=script; crossorigin=anonymous`
-      )
-      .concat(responseHeaders.get("Link") as string)
+      .map((link) => `<${link}>; rel=preload; as=script; crossorigin=anonymous`)
+      .concat(responseHeaders.get("Link") ?? "")
       .filter(Boolean)
-      .join(",")
+      .join()
   );
+
   if (!responseHeaders.has("Content-Type")) {
     responseHeaders.set("Content-Type", "text/html; charset=utf-8");
   }
