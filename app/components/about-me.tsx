@@ -1,4 +1,4 @@
-import { MASTODON_URL } from "~/constants";
+import { GITHUB_URL, LINKEDIN_URL, MASTODON_URL } from "~/constants";
 
 export function Me() {
   return (
@@ -21,10 +21,8 @@ export function Me() {
           </a>{" "}
           but I'm also on{" "}
           <a href="https://twitter.com/tomus_sherman">Twitter</a>,{" "}
-          <a href="https://www.linkedin.com/in/tom-sherman-2a2aa0136/">
-            LinkedIn
-          </a>
-          , and <a href="https://github.com/tom-sherman">GitHub</a>.
+          <a href={LINKEDIN_URL}>LinkedIn</a>, and{" "}
+          <a href={GITHUB_URL}>GitHub</a>.
         </p>
       </div>
     </div>
