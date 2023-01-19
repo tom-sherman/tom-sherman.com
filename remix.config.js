@@ -4,6 +4,9 @@ module.exports = {
   server: "./server.js",
   devServerBroadcastDelay: 1000,
   ignoredRouteFiles: ["**/.*"],
+  future: {
+    v2_routeConvention: true,
+  },
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // serverBuildPath: "functions/[[path]].js",
