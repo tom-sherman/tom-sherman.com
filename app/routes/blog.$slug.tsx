@@ -127,12 +127,17 @@ export default function BlogPost() {
     };
   }, [post.content]);
 
+  const lastModifiedAt = post.lastModifiedAt
+    ? new Date(post.lastModifiedAt)
+    : null;
+  const createdAt = new Date(post.createdAt);
+
   return (
     <>
       <small>
         {new Intl.DateTimeFormat("en-GB", {
           dateStyle: "long",
-        }).format(new Date(post.createdAt))}{" "}
+        }).format(createdAt)}{" "}
         - {post.readingTimeText}
       </small>
       <div
@@ -142,14 +147,14 @@ export default function BlogPost() {
         }}
       />
       <hr />
-      {post.lastModifiedAt ? (
+      {lastModifiedAt && !isSameDay(createdAt, lastModifiedAt) ? (
         <p>
           <small>
             <em>
               This article was last updated on{" "}
               {new Intl.DateTimeFormat("en-GB", {
                 dateStyle: "long",
-              }).format(new Date(post.lastModifiedAt))}
+              }).format(lastModifiedAt)}
             </em>
           </small>
         </p>
@@ -162,6 +167,14 @@ export default function BlogPost() {
         ))}
       </ul>
     </>
+  );
+}
+
+function isSameDay(date1: Date, date2: Date) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
   );
 }
 
