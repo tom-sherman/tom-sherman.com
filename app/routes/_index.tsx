@@ -11,17 +11,6 @@ import { PostTitle } from "~/components/post-list";
 export async function loader({ context }: LoaderArgs) {
   const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
 
-  const result = await ((context.env as any).DB as D1Database)
-    .prepare(
-      `select * from "BlogPosts" where "Status" = ? order by "CreatedAt" desc`
-    )
-    .bind("published")
-    .all();
-
-  delete result.results;
-
-  console.log(JSON.stringify(result));
-
   return defer({
     recentBlogPosts: blog.list3RecentPosts().then((posts) =>
       posts.map((post) => ({
