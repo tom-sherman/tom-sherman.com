@@ -11,7 +11,7 @@ export function Me() {
       <div>
         <h1>Hey 👋 I'm Tom, a Software Engineer from the UK.</h1>
         <p>
-          I'm currently a Software Engineer at OVO energy. I'm super into the
+          I'm currently a Software Engineer at OVO Energy. I'm super into the
           web, functional programming, and strong type systems.
         </p>
         <p>
