@@ -1,11 +1,11 @@
-import type { LoaderArgs } from "@remix-run/cloudflare";
+import type { DataFunctionArgs } from "@remix-run/cloudflare";
 
 const usernameAliases = ["me", "tom", "tomsherman", "mastodon", "social"];
 const resources = usernameAliases.map(
   (username) => `acct:${username}@tom-sherman.com`
 );
 
-export function loader({ request }: LoaderArgs) {
+export function loader({ request }: DataFunctionArgs) {
   const url = new URL(request.url);
   const resourceQuery = url.searchParams.get("resource");
 

@@ -1,6 +1,6 @@
 import type {
   LinksFunction,
-  LoaderArgs,
+  DataFunctionArgs,
   MetaFunction,
   SerializeFrom,
 } from "@remix-run/cloudflare";
@@ -23,7 +23,7 @@ import { useClientNavigationLinks } from "~/lib/use-client-navigation-links";
 
 const SHIKI_PATH = "/build/shiki";
 
-export async function loader({ params, context }: LoaderArgs) {
+export async function loader({ params, context }: DataFunctionArgs) {
   const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   const slug = params.slug;

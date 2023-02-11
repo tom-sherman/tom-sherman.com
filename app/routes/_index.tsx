@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/cloudflare";
+import type { DataFunctionArgs } from "@remix-run/cloudflare";
 import { defer } from "@remix-run/cloudflare";
 import { Link, useLoaderData, Await } from "@remix-run/react";
 import type { ReactNode } from "react";
@@ -8,7 +8,7 @@ import { Me } from "~/components/about-me";
 import { Copyright } from "~/components/copyright";
 import { PostTitle } from "~/components/post-list";
 
-export async function loader({ context }: LoaderArgs) {
+export async function loader({ context }: DataFunctionArgs) {
   const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   return defer({

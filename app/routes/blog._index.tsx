@@ -1,11 +1,11 @@
-import type { LoaderArgs, MetaFunction } from "@remix-run/cloudflare";
+import type { DataFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { D1BlogData, createD1Kysely } from "~/lib/blog-data.server";
 import { PostList } from "~/components/post-list";
 import { Chip } from "~/components/chip";
 
-export async function loader({ context }: LoaderArgs) {
+export async function loader({ context }: DataFunctionArgs) {
   const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   const [posts, tags] = await Promise.all([

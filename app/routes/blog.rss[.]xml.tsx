@@ -1,8 +1,8 @@
-import type { LoaderArgs } from "@remix-run/cloudflare";
+import type { DataFunctionArgs } from "@remix-run/cloudflare";
 import { createD1Kysely, D1BlogData } from "~/lib/blog-data.server";
 import { HOST } from "~/constants";
 
-export async function loader({ context }: LoaderArgs) {
+export async function loader({ context }: DataFunctionArgs) {
   const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   const posts = await blog.listAllPosts();
