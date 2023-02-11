@@ -12,7 +12,7 @@ export const loader = async ({ params, context }: LoaderArgs) => {
     throw new Response("Not found", { status: 404 });
   }
 
-  const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
+  const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   const posts = await blog.listPostsByTag(tag);
 
