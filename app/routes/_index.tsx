@@ -9,7 +9,7 @@ import { Copyright } from "~/components/copyright";
 import { PostTitle } from "~/components/post-list";
 
 export async function loader({ context }: LoaderArgs) {
-  const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
+  const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   return defer({
     recentBlogPosts: blog.list3RecentPosts().then((posts) =>

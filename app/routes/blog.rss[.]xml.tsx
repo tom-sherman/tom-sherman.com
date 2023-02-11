@@ -3,7 +3,7 @@ import { createD1Kysely, D1BlogData } from "~/lib/blog-data.server";
 import { HOST } from "~/constants";
 
 export async function loader({ context }: LoaderArgs) {
-  const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
+  const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   const posts = await blog.listAllPosts();
 

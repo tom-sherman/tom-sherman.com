@@ -24,7 +24,7 @@ import { useClientNavigationLinks } from "~/lib/use-client-navigation-links";
 const SHIKI_PATH = "/build/shiki";
 
 export async function loader({ params, context }: LoaderArgs) {
-  const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
+  const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   const slug = params.slug;
 
@@ -38,7 +38,7 @@ export async function loader({ params, context }: LoaderArgs) {
     const github = new GitHubBlogData(
       githubRequest.defaults({
         headers: {
-          authorization: `token ${(context as any).env.GITHUB_TOKEN}`,
+          authorization: `token ${context.env.GITHUB_TOKEN}`,
           accept: "application/vnd.github.v3+json",
         },
       })

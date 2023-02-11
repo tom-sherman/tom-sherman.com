@@ -6,7 +6,7 @@ import { PostList } from "~/components/post-list";
 import { Chip } from "~/components/chip";
 
 export async function loader({ context }: LoaderArgs) {
-  const blog = new D1BlogData(createD1Kysely((context as any).env.DB));
+  const blog = new D1BlogData(createD1Kysely(context.env.DB));
 
   const [posts, tags] = await Promise.all([
     blog.listAllPosts(),
