@@ -22,9 +22,6 @@ export const onRequest: PagesFunction<{
     return new Response("Missing signature", { status: 400 });
   }
 
-  if (!signature) {
-    return new Response("Missing signature", { status: 400 });
-  }
   const body = await request.clone().text();
 
   const verified = await verify(env.BLOG_WEBHOOK_SECRET, body, signature);
