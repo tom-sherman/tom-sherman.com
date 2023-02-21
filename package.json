@@ -16,6 +16,7 @@
     "@remix-run/cloudflare-pages": "^1.11.0",
     "@remix-run/react": "^1.11.0",
     "@remix-run/server-runtime": "^1.11.0",
+    "@total-typescript/ts-reset": "^0.3.7",
     "cross-env": "^7.0.3",
     "isbot": "^3.6.5",
     "kysely": "^0.23.4",
