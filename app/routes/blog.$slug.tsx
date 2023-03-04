@@ -21,6 +21,7 @@ import type { RenderableTreeNode } from "@markdoc/markdoc";
 import { Suspense } from "react";
 import RenderMarkdown from "~/lib/markdown/renderer";
 import { HighlightedCode } from "~/lib/shiki.client";
+import { SHIKI_PATH } from "~/constants";
 
 export async function loader({ params, context }: DataFunctionArgs) {
   const blog = new D1BlogData(createD1Kysely(context.env.DB));
@@ -91,15 +92,15 @@ export const meta: MetaFunction = ({
   };
 };
 
-// Commenting out because I can't figure out how to not preload on subsequent client blog post navigations
-// export const links: LinksFunction = () => [
-//   {
-//     rel: "preload",
-//     href: `${SHIKI_PATH}/dist/onig.wasm`,
-//     as: "fetch",
-//     crossOrigin: "anonymous",
-//   },
-// ];
+// TODO: Figure out how to skip this preload on clientside navigations (if we've already seen a blog post)
+export const links: LinksFunction = () => [
+  {
+    rel: "preload",
+    href: `${SHIKI_PATH}/dist/onig.wasm`,
+    as: "fetch",
+    crossOrigin: "anonymous",
+  },
+];
 
 export default function BlogPost() {
   useClientNavigationLinks();
