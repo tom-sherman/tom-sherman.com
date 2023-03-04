@@ -7,9 +7,11 @@ import { createCache } from "suspense";
 export type { Highlighter } from "shiki";
 
 setCDN(`${SHIKI_PATH}/`);
+
+const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
 const highlighterPromise = getHighlighter({
   langs: [],
-  themes: [],
+  themes: [darkModePreference.matches ? "github-dark" : "github-light"],
 });
 
 const highlighterCache = createCache<
@@ -61,7 +63,6 @@ export const HighlightedCode = memo(function HighlightedCode({
   return <code dangerouslySetInnerHTML={{ __html: codeElement.innerHTML }} />;
 });
 
-const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
 function useColorMode() {
   return useSyncExternalStore(
     (callback) => {
