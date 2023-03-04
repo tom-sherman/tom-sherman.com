@@ -7,6 +7,11 @@ startTransition(() => {
     document,
     <StrictMode>
       <RemixBrowser />
-    </StrictMode>
+    </StrictMode>,
+    {
+      onRecoverableError() {
+        // Ignore recoverable errors
+      },
+    }
   );
 });
