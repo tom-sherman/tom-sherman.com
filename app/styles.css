@@ -80,4 +80,6 @@ nav.container.blog-nav {
 .post-content > article {
   background: none;
   padding: 0;
+  box-shadow: none;
+  border-radius: 0;
 }
