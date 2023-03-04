@@ -9,6 +9,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@markdoc/markdoc": "^0.2.2",
     "@octokit/request": "^6.2.2",
     "@octokit/webhooks-methods": "^3.0.1",
     "@picocss/pico": "^1.5.6",
@@ -21,18 +22,17 @@
     "isbot": "^3.6.5",
     "kysely": "^0.23.4",
     "kysely-d1": "^0.2.0",
-    "marked": "^4.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reading-time": "^1.5.0",
     "shiki": "0.11.1",
+    "suspense": "^0.0.10",
     "zod": "^3.19.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.18.0",
     "@remix-run/dev": "^1.11.0",
     "@remix-run/eslint-config": "^1.11.0",
-    "@types/marked": "^4.0.7",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "dotenv": "^16.0.3",

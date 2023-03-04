@@ -6,3 +6,4 @@ export const HOST =
   process.env.NODE_ENV === "production"
     ? "https://tom-sherman.com"
     : "http://localhost:8788";
+export const SHIKI_PATH = "/build/shiki";

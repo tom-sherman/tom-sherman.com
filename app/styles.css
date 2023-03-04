@@ -72,3 +72,14 @@ nav.container.blog-nav {
   margin-left: 0 auto;
   padding: var(--block-spacing-vertical) calc(var(--spacing));
 }
+
+/*
+ Markdoc renders an an "article" node at the top level of the post content.
+ This CSS overrides the default styling from pico of articles inside a post.
+ */
+.post-content > article {
+  background: none;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 0;
+}

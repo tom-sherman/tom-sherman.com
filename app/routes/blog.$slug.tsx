@@ -10,18 +10,18 @@ import { Link, useLoaderData } from "@remix-run/react";
 import {
   D1BlogData,
   createD1Kysely,
-  renderPostToHtml,
   GitHubBlogData,
 } from "~/lib/blog-data.server";
 import { Chip } from "~/components/chip";
-import { getHighlighter, setCDN } from "shiki";
-import { useEffect, useRef } from "react";
-import { useIsomorphicLayoutEffect } from "~/lib/use-isomorphic-layout-effect";
 import readingTime from "reading-time";
 import { request as githubRequest } from "@octokit/request";
 import { useClientNavigationLinks } from "~/lib/use-client-navigation-links";
-
-const SHIKI_PATH = "/build/shiki";
+import { parseMarkdown } from "~/lib/markdown/markdown.server";
+import type { RenderableTreeNode } from "@markdoc/markdoc";
+import { Suspense } from "react";
+import RenderMarkdown from "~/lib/markdown/renderer";
+import { HighlightedCode } from "~/lib/shiki.client";
+import { SHIKI_PATH } from "~/constants";
 
 export async function loader({ params, context }: DataFunctionArgs) {
   const blog = new D1BlogData(createD1Kysely(context.env.DB));
@@ -59,7 +59,7 @@ export async function loader({ params, context }: DataFunctionArgs) {
   return json({
     post: {
       title: post.title,
-      content: renderPostToHtml(post.content),
+      content: parseMarkdown(post.content),
       tags: post.tags,
       createdAt: post.createdAt,
       readingTimeText: readingTime(post.content).text,
@@ -92,6 +92,7 @@ export const meta: MetaFunction = ({
   };
 };
 
+// TODO: Figure out how to skip this preload on clientside navigations (if we've already seen a blog post)
 export const links: LinksFunction = () => [
   {
     rel: "preload",
@@ -104,28 +105,6 @@ export const links: LinksFunction = () => [
 export default function BlogPost() {
   useClientNavigationLinks();
   const { post } = useLoaderData<typeof loader>();
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useIsomorphicLayoutEffect(() => {
-    highlightBlocks(
-      contentRef.current!,
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    );
-  }, [post.content]);
-
-  useEffect(() => {
-    function changeListener(event: MediaQueryListEvent) {
-      highlightBlocks(contentRef.current!, event.matches);
-    }
-
-    const query = window.matchMedia("(prefers-color-scheme: dark)");
-
-    query.addEventListener("change", changeListener);
-
-    return () => {
-      query.removeEventListener("change", changeListener);
-    };
-  }, [post.content]);
 
   const lastModifiedAt = post.lastModifiedAt
     ? new Date(post.lastModifiedAt)
@@ -140,12 +119,7 @@ export default function BlogPost() {
         }).format(createdAt)}{" "}
         - {post.readingTimeText}
       </small>
-      <div
-        ref={contentRef}
-        dangerouslySetInnerHTML={{
-          __html: post.content,
-        }}
-      />
+      <PostContent content={post.content} />
       <hr />
       {lastModifiedAt && !isSameDay(createdAt, lastModifiedAt) ? (
         <p>
@@ -170,44 +144,43 @@ export default function BlogPost() {
   );
 }
 
+interface Preprops {
+  children: string;
+  "data-language"?: string;
+  theme: string;
+}
+
+function Pre({ children, "data-language": language }: Preprops) {
+  const fallback = <code>{children}</code>;
+  return (
+    <pre className={`language-${language}`}>
+      {language ? (
+        <Suspense fallback={fallback}>
+          <HighlightedCode language={language}>{children}</HighlightedCode>
+        </Suspense>
+      ) : (
+        fallback
+      )}
+    </pre>
+  );
+}
+
+const components = {
+  pre: Pre,
+};
+
+const PostContent = function PostContent({
+  content,
+}: {
+  content: RenderableTreeNode;
+}) {
+  return <RenderMarkdown content={content} components={components} />;
+};
+
 function isSameDay(date1: Date, date2: Date) {
   return (
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&
     date1.getDate() === date2.getDate()
   );
-}
-
-function highlightBlocks(container: HTMLElement, prefersDarkMode: boolean) {
-  const codeBlocks = container.querySelectorAll("pre code");
-
-  const codeBlocksArray = Array.from(codeBlocks);
-
-  const languages = new Set(
-    codeBlocksArray
-      .map((block) => {
-        const lang = block.className.split("-")[1];
-        return lang;
-      })
-      .filter((lang): lang is string => !!lang)
-  );
-
-  setCDN(`${SHIKI_PATH}/`);
-  getHighlighter({
-    theme: prefersDarkMode ? "github-dark" : "github-light",
-    langs: Array.from(languages) as any,
-  }).then((highlighter) => {
-    codeBlocksArray.forEach((code) => {
-      const lang = code.className.split("-")[1];
-      const container = document.createElement("div");
-      container.innerHTML = highlighter.codeToHtml(code.textContent || "", {
-        lang,
-      });
-
-      const newCode = container.querySelector("code")!;
-      newCode.className = code.className;
-
-      code.replaceWith(newCode);
-    });
-  });
 }
