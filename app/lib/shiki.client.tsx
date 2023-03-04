@@ -1,4 +1,4 @@
-import { memo, useEffect, useState, useSyncExternalStore } from "react";
+import { memo, useSyncExternalStore } from "react";
 import type { Highlighter } from "shiki";
 import { getHighlighter, setCDN } from "shiki";
 import { SHIKI_PATH } from "~/constants";
@@ -61,22 +61,24 @@ export const HighlightedCode = memo(function HighlightedCode({
   return <code dangerouslySetInnerHTML={{ __html: codeElement.innerHTML }} />;
 });
 
-function useColorMode(inferredServerValue?: "light" | "dark") {
+const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
+function useColorMode() {
   return useSyncExternalStore(
     (callback) => {
-      const listener = () => {
-        callback();
-      };
-      window.addEventListener("color-mode-change", listener);
+      const controller = new AbortController();
+
+      darkModePreference.addEventListener("change", () => callback(), {
+        signal: controller.signal,
+      });
+
       return () => {
-        window.removeEventListener("color-mode-change", listener);
+        controller.abort();
       };
     },
     () => {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+      return darkModePreference.matches ? "dark" : "light";
     },
-    () => inferredServerValue ?? "light"
+    // NOTE: Supply a better server value (maybe from headers) if this hook is ever used outside of a client module.
+    () => "light"
   );
 }
