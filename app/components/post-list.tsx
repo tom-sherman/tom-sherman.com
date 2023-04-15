@@ -23,7 +23,7 @@ export function PostList({ posts }: PostListProps) {
         return (
           <li key={post.slug}>
             <code>{formattedDate}</code>{" "}
-            <Link to={`/blog/${post.slug}`}>
+            <Link to={`/blog/${post.slug}`} prefetch="intent">
               <PostTitle title={post.title} />
             </Link>
           </li>

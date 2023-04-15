@@ -48,7 +48,7 @@ export default function Index() {
                 {posts.map((post) => (
                   <article key={post.url}>
                     <header>{post.createdAt}</header>
-                    <Link to={post.url}>
+                    <Link to={post.url} prefetch="intent">
                       <PostTitle as="h3" title={post.title} />
                     </Link>
                   </article>

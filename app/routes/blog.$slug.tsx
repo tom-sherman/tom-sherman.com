@@ -56,17 +56,24 @@ export async function loader({ params, context }: DataFunctionArgs) {
     throw new Response("Not found", { status: 404 });
   }
 
-  return json({
-    post: {
-      title: post.title,
-      content: parseMarkdown(post.content),
-      tags: post.tags,
-      createdAt: post.createdAt,
-      readingTimeText: readingTime(post.content).text,
-      description: post.description,
-      lastModifiedAt: post.lastModifiedAt,
+  return json(
+    {
+      post: {
+        title: post.title,
+        content: parseMarkdown(post.content),
+        tags: post.tags,
+        createdAt: post.createdAt,
+        readingTimeText: readingTime(post.content).text,
+        description: post.description,
+        lastModifiedAt: post.lastModifiedAt,
+      },
     },
-  });
+    {
+      headers: {
+        "Cache-Control": "public, max-age=30",
+      },
+    }
+  );
 }
 
 export const meta: MetaFunction = ({
