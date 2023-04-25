@@ -83,8 +83,8 @@ export default function Index() {
           }
         />
         <Project
-          name="response-multipart"
-          url="https://github.com/tom-sherman/response-multipart"
+          name="fetch-multipart"
+          url="https://github.com/tom-sherman/fetch-multipart"
           description={
             <>
               <p>
